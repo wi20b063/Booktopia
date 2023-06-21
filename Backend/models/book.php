@@ -1,17 +1,30 @@
 <?php
 
 // Book Model --> only suggestion, needs to be adapted
+enum GenreType {
+    case Biographie;
+    case Sachbuch;
+    case Krimi;
+    case Allgemein;
+}
+
+enum LanguageType {
+    case Deutsch;
+    case Englisch;
+    case Französisch;
+    case Andere ;
+}
 
 class Book {
 
-    public $bookid;
+    public $bookId;
     public $title;
     public $author;
-    public $publisher;
+    public $rating;
     public $isbn;
-    public $year;
-    public $genre;
-    public $language;
+  
+    public  $genre;
+    public  $language;
     public $price;
     public $description;
     public $image;
@@ -19,16 +32,15 @@ class Book {
     
 
 
-    public function __construct(int $bookid, string $title, string $author,
-                                string $publisher, string $isbn, string $year,
-                                string $genre, string $language, string $price,
-                                string $description, string $image, string $stock) { 
-        $this->bookid         = $bookid;
+    public function __construct(int $bookId, string $title, string $author,
+                                string $rating, string $isbn,
+                                 string $genre, string $language, int $price,
+                                string $description, string $image, int $stock) { 
+        $this->bookId         = $bookId;
         $this->title          = $title;
         $this->author         = $author;
-        $this->publisher      = $publisher;
+        $this->rating         = $rating;
         $this->isbn           = $isbn;
-        $this->year           = $year;
         $this->genre          = $genre;
         $this->language       = $language;
         $this->price          = $price;
@@ -37,8 +49,8 @@ class Book {
         $this->stock          = $stock;
     }
 
-    public function getBookid() {
-        return $this->bookid;
+    public function getBookId() {
+        return $this->bookId;
     }
     
     public function getTitle() {

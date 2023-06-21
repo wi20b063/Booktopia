@@ -1,10 +1,10 @@
 <?php
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path .'/backend/logic/session.php');
+require_once ($path . '/backend/models/paymentType.php');
 
-//require(dirname(__FILE__, 3) . "/config/dbaccess.php");
-require (dirname(__FILE__, 2) . "\session.php");
 
-
-$salutation = $firstName = $lastName = $address = $postcode = $location = $creditCard = $email = $username = $password = "";
+$salutation = $firstName = $lastName = $address = $postalCode = $location  = $email = $username = $password = $admin = $active= 0;
 
 
 // UserService Class implements CRUD operations
@@ -14,10 +14,15 @@ class UserService {
     // get data from MySQL database with SQL statements
     private $con;
     private $tbl_user;
+    private $userID;
+
+    private User $user;
 
     public function __construct($con, $tbl_user) {
         $this->con = $con;
         $this->tbl_user = $tbl_user;
+        $this->userID=$_SESSION["userid"];
+
     }
 
     // find all users mit prepared statement
@@ -29,7 +34,7 @@ class UserService {
 
         $users = [];
         while ($row = $result->fetch_assoc()) {
-            $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
+            $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postalCode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
             $users[] = $user;
         }
 
@@ -55,7 +60,7 @@ class UserService {
             return null; // Benutzer nicht gefunden
         }
 
-        $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
+        $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postalCode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
         return $user;
     } */
 
@@ -66,7 +71,7 @@ class UserService {
         $firstName = $user['firstName'];
         $lastName = $user['lastName'];
         $address = $user['address'];
-        $postcode = $user['postcode'];
+        $postalCode = $user['postalCode'];
         $location = $user['location'];
         $email = $user['email'];
         $username = $user['username'];
@@ -94,9 +99,9 @@ class UserService {
             
             
             // update user with prepared statement
-            /* $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, creditCard = ?, email = ?, username = ?, password = ? WHERE username = ?";
+            /* $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postalCode = ?, location = ?, creditCard = ?, email = ?, username = ?, password = ? WHERE username = ?";
             $stmt = $this->con->prepare($sqlUpd);
-            $stmt->bind_param("sssssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password, $username);
+            $stmt->bind_param("sssssssssss", $salutation, $firstName, $lastName, $address, $postalCode, $location, $creditCard, $email, $username, $password, $username);
             $stmt->execute();
             $result = $stmt->get_result();
             if ($result->affected_rows > 0) {
@@ -108,9 +113,9 @@ class UserService {
         } else {
             echo " User does not exist";
             // add user with prepared statement         
-            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, creditCard, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postalCode, location, creditCard, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->con->prepare($sqlIns);
-            $stmt->bind_param("ssssssssssii", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password, $active, $admin);
+            $stmt->bind_param("ssssssssssii", $salutation, $firstName, $lastName, $address, $postalCode, $location, $creditCard, $email, $username, $password, $active, $admin);
             $stmt->execute();
             $result = mysqli_stmt_affected_rows($stmt);
             
@@ -253,6 +258,52 @@ class UserService {
     } */
 
     // Close connection
+
+    public function addNewPaymentMethod($paymentType, $paymentMethod, $paymemntMethodDetails){
+        // create payment method, find out paymentItemNr and update database
+        $userPaymentMethodId=$this->getNewPaymentMethodID($this->userID);
+        
+        $sqlIns = "INSERT INTO paymentitems (userId, userPaymentItemId, paymentItem, paymentNum) VALUES (?,?,?,?)";
+            $stmt = $this->con->prepare($sqlIns);
+            $stmt->bind_param("i,i,i,s", $this->userID, $userPaymentMethodId, $paymentMethod, $paymemntMethodDetails);
+            $stmt->execute();
+            $result = mysqli_stmt_affected_rows($stmt);
+            if ($result == 1) {
+                // user created
+                echo " Paymentmethod added";
+            } else {
+                // error - user not created
+                echo " ERROR - Payment Method not created";
+            }
+
+    }
+
+    public function getNewPaymentMethodID($userID){
+        $index=0;
+        $sql = "Select Max(userPaymentItemId) from paymentItems WHERE userId = ?";
+        $query = $this->con->prepare($sql);
+        $query->bind_param("s", $this->userID);
+        $query->execute();
+        $query->bind_result($index);
+        $query->fetch();
+        return $index+1;
+    }
+
+    public function getUserPayMethods($userID){
+        $sql = "Select * from paymentItems WHERE userId = ?";
+        $query = $this->con->prepare($sql);
+        $query->bind_param("s", $this->userID);
+        $query->execute();
+        $result= $query->get_result();
+        while($resSet = mysqli_fetch_assoc($result)){
+            $userPayMethods[$i++]= new PaymenMetType($resSet['userId'], $resSet['userPayMethodId'],$resSet['paymentMethod'],$resSet['payMethodDetails']);
+        }
+        return $userPayMethods;
+    }
+
+
+    
+
     public function closeConnection() {
         $this->con->close();
     }

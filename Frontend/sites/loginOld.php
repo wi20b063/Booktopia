@@ -71,7 +71,7 @@ function query_UserData($username, $hashedPassword) {
             $_SESSION["admin"] = $row["admin"];
             $_SESSION["username"] = $row["username"];
             $_SESSION["password"] = $row["password"];
-            $_SESSION["userid"] = $row["userid"];
+            $_SESSION["userId"] = $row["userId"];
         }
 
     } else {

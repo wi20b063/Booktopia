@@ -25,7 +25,7 @@ class BookService {
 
         $books = [];
         while ($row = $result->fetch_assoc()) {
-            $book = new Book($row['bookid'], $row['title'], $row['author'], $row['publisher'], $row['isbn'], $row['year'], $row['genre'], $row['language'], $row['price'], $row['description'], $row['image'], $row['stock']);
+            $book = new Book($row['bookId'], $row['title'], $row['author'], $row['publisher'], $row['isbn'], $row['year'], $row['genre'], $row['language'], $row['price'], $row['description'], $row['image'], $row['stock']);
             $books[] = $book;
         }
 
@@ -51,72 +51,14 @@ class BookService {
             return null; // Benutzer nicht gefunden
         }
 
-        $book = new Book($row['bookid'], $row['title'], $row['author'], $row['publisher'], $row['isbn'], $row['year'], $row['genre'], $row['language'], $row['price'], $row['description'], $row['image'], $row['stock']);
+        $book = new Book($row['bookId'], $row['title'], $row['author'], $row['publisher'], $row['isbn'], $row['year'], $row['genre'], $row['language'], $row['price'], $row['description'], $row['image'], $row['stock']);
         return $book;
     }
 
 
-    // create or update book mit prepared statement
-    public function saveBook(Book $book) {
-        $title = $book->getTitle();
-        $author = $book->getAuthor();
-        $publisher = $book->getPublisher();
-        $isbn = $book->getIsbn();
-        $year = $book->getYear();
-        $genre = $book->getGenre();
-        $language = $book->getLanguage();
-        $price = $book->getPrice();
-        $description = $book->getDescription();
-        $image = $book->getImage();
-        $stock = $book->getStock();
-
-        // check if book already exists with prepared statement
-        $sql = "SELECT * FROM book WHERE isbn = ?";
-        $stmt = $this->con->prepare($sql);
-        $stmt->bind_param("s", $isbn);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            // Book already exists
-            // code for updating book
-            $sqlUpd = "UPDATE book SET title = ?, author = ?, publisher = ?, isbn = ?, year = ?, genre = ?, language = ?, price = ?, description = ?, image = ?, stock = ? WHERE isbn = ?";
-            $stmt = $this->con->prepare($sqlUpd);
-            $stmt -> bind_param("ssssssssssss", $title, $author, $publisher, $isbn, $year, $genre, $language, $price, $description, $image, $stock, $isbn);
-            $stmt -> execute();
-            $stmt -> close();
-            $result = $stmt->get_result();
-            if ($result->affected_rows > 0) {
-                // book updated
-                header("Refresh:0; url=../index.php");
-            } else {
-                // error - book not updated
-            }
-        } else {
-            // add book with prepared statement
-            $sqlIns = "INSERT INTO book (title, author, publisher, isbn, year, genre, language, price, description, image, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $this->con->prepare($sqlIns);
-            $stmt -> bind_param("sssssssssss", $title, $author, $publisher, $isbn, $year, $genre, $language, $price, $description, $image, $stock);
-            $stmt -> execute();
-            $stmt -> close();
-            $result = $stmt->get_result();
-            if ($result->affected_rows > 0) {
-                // book created
-                header("Refresh:0; url=../index.php");
-            } else {
-                // error - book not created
-            }
-        }
-    }
+   
   
-    /* public function delete(User $user) {
-        
-        // Implementieren Sie den Code, um einen vorhandenes Buch aus der Datenquelle zu löschen
-        // Beispiel:
-        // Database::execute("DELETE FROM book WHERE id = ?", [$book->getId()]);
-        
-        return true;
-    } */
+    
 
     // Close connection
     public function closeConnection() {

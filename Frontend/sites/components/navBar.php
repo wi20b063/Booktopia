@@ -23,17 +23,20 @@
             <li class="nav-item" id="navRegister">
                 <a class="nav-link" href="../sites/registration.php">Registrierung</a>
             </li>
-            <li class="nav-item" id="navManageProducts">
-                <a class="nav-link" href="#">Produkte verwalten</a>
-            </li>
-            <li class="nav-item" id="navManageCustomers">
-                <a class="nav-link" href="#">Kunden verwalten</a>
-            </li>
-            <li class="nav-item" id="navManageVouchers">
-                <a class="nav-link" href="#">Gutscheine verwalten</a>
-            </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+            <li class="nav-item" id="navManagement">
+                <a class="nav-link" href="#">Verwaltung</a>
+                <ul>
+                    <li class="nav-item" id="navManageCustomers">
+                        <a class="nav-link" href="#">Kunden verwalten</a>
+                    </li>
+                    <li class="nav-item" id="navManageVouchers">
+                        <a class="nav-link" href="#">Gutscheine verwalten</a>
+                    </li>
+                    <li class="nav-item" id="navManageBooks">
+                     <a class="nav-link" href="#">Gutscheine verwalten</a>
+                    </li>
+                </ul>
+                <!--   a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
             </li> -->
         </ul>
 

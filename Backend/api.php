@@ -13,9 +13,13 @@ require (dirname(__FILE__) . "\models\user.php");
 require (dirname(__FILE__) . "\logic\services\userService.php");
 require (dirname(__FILE__) . "\models\book.php");
 require (dirname(__FILE__) . "\logic\services\bookService.php");
+require (dirname(__FILE__) . "\logic\services\admin_manageBooks.php");
+require (dirname(__FILE__) . "\logic\services\adminUser.php");
+require (dirname(__FILE__) . "\logic\services\admin_manageOrders.php");
+require (dirname(__FILE__) . "\logic\services\admin_manageVouchers.php");
 
 // an instance of the API class is created
-$api = new Api($con, $tbl_user, $tbl_book);
+$api = new Api($con, $tbl_user, $tbl_books, $tbl_orders, $tbl_vouchers);
 
 // call processRequest for working on requests
 $api->processRequest();
@@ -24,12 +28,22 @@ class Api {
     // constructor
     private $userService;
     private $bookService;
+    private $admin_manageBooks;
+    private $admin_manageCustomers;
+    private $admin_manageOrders;
+    private $admin_manageVouchers;
+
 
     // is called when a new instance of the service calsses is created
     public function __construct($con, $tbl_user, $tbl_book) {
         // create instances of the services
         $this->userService = new UserService($con, $tbl_user);
-        $this->bookService = new BookService($con, $tbl_book);
+        $this->bookService = new BookService($con, $tbl_books);
+        $this->admin_manageBooks = new Admin_manageBooks($con, $tbl_books);
+        $this->admin_manageCustomers = new Admin_manageUsers($con, $tbl_user);
+        $this->admin_manageOrders = new Admin_manageOrders($con, $tbl_orders);
+        
+
     }
 
     

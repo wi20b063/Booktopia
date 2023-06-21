@@ -5,7 +5,11 @@
    $dbpassword = ""; //derzeit noch kein Passwort gesetzt
    $db = "bookstopia";
    $tbl_user = "user";
-   $tbl_book = "book";
+   $tbl_voucher = "voucher";
+   $tbl_order = "order";
+   $tbl_order_details = "order_details";
+   $tbl_book="book";
+   $tbl_payment_items="paymentitems";
 
     // Create connection
    $con = new mysqli($dbhost, $dbuser, $dbpassword, $db);
@@ -19,7 +23,7 @@
 
     /*
     // Create new data
-    $sql = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, email, username, password, active, admin) VALUES ('Frau', 'Denise', 'Denise', 'Straße', '1010', 'Wien', 'denise@bookstopia.at', 'Denise', 'PW', 1, 1)";
+    $sql = "INSERT INTO user (salutation, firstName, lastName, address, postalCode, location, email, username, password, active, admin) VALUES ('Frau', 'Denise', 'Denise', 'Straße', '1010', 'Wien', 'denise@bookstopia.at', 'Denise', 'PW', 1, 1)";
 
     // Check if record was created
     if ($con->query($sql) === TRUE) {

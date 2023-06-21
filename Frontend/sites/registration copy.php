@@ -32,10 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors['errorAddress']="Das Feld Adresse muss ausgefüllt sein!";
     }
 
-    if (isset($_POST["postcode"]) && !empty($_POST["postcode"])) {
-    $postcode = $_POST["postcode"];
+    if (isset($_POST["postalCode"]) && !empty($_POST["postalCode"])) {
+    $postalCode = $_POST["postalCode"];
     }else{
-        $errors['errorPostcode']="Das Feld PLZ muss ausgefüllt sein!";
+        $errors['errorpostalCode']="Das Feld PLZ muss ausgefüllt sein!";
     }
 
     if (isset($_POST["location"]) && !empty($_POST["location"])) {
@@ -138,8 +138,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             class="form-control" required>
                                         <br>
 
-                                        <label for="postcode">PLZ:</label><br>
-                                        <input type="int" name="postcode" id="postcode" placeholder="1010"
+                                        <label for="postalCode">PLZ:</label><br>
+                                        <input type="int" name="postalCode" id="postalCode" placeholder="1010"
                                             class="form-control" required>
                                         <br>
 

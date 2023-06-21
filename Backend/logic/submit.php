@@ -1,13 +1,15 @@
 <?php
 
 session_start();
-require (dirname(__FILE__,2) . "\config\dbaccess.php");
+$path = $_SERVER['DOCUMENT_ROOT'];
+
+require ($path."config/dbaccess.php");
 
 $salutation = $_POST['salutation'];
 $firstName = $_POST['firstName'];
 $lastName = $_POST['lastName'];
 $address = $_POST['address'];
-$postcode = $_POST['postcode'];
+$postalCode = $_POST['postalCode'];
 $location = $_POST['location'];
 $email = $_POST['email'];
 $username = $_POST['username'];
@@ -16,9 +18,9 @@ $creditCard = $_POST['creditCard'];
 
 $conn = new mysqli($dbhost, $dbuser, $dbpassword, $db);
 
-$stmt = $conn->prepare("INSERT INTO user (salutation, firstName, lastName, address, postcode, location, creditCard, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0)");
+$stmt = $conn->prepare("INSERT INTO user (salutation, firstName, lastName, address, postalCode, location, creditCard, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0)");
 
-$stmt->bind_param("ssssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password);
+$stmt->bind_param("ssssssssss", $salutation, $firstName, $lastName, $address, $postalCode, $location, $creditCard, $email, $username, $password);
 
 if ($stmt->execute()) {
     echo "Successful";

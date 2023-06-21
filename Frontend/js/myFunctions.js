@@ -1,9 +1,6 @@
 $(document).ready(function () {
 
     console.log("Ready ... DOM loaded!");
-
-    //loadHead();
-    //loadFooter();
     loadNavBar();
 
     // when clicked button with id="btnSubmitLogin" in login.php call function loginUser()"
@@ -22,21 +19,19 @@ $(document).ready(function () {
         logoutUser();
     });
 
-
   });
 
-
+// function to define which user can see which navbar items
 function loadNavBar() {
 
     var userSession = getSessionVariables();
 
-    console.log(userSession);
+    var sessionUsername = userSession['sessionUsername'];
+    var sessionUserid = userSession['sessionUserid'];
+    var sessionAdmin = userSession['sessionAdmin'];
+    var sessionActive = userSession['sessionActive'];
 
-    var sessionUsername = userSession['username'];
-    var sessionUserid = userSession['userid'];
-    var sessionAdmin = userSession['admin'];
-    var sessionActive = userSession['active'];
-
+    console.log("user description:")
     console.log("username: " + sessionUsername);
     console.log("userid: " + sessionUserid);
     console.log("admin: " + sessionAdmin);
@@ -45,48 +40,30 @@ function loadNavBar() {
     if (sessionUsername != null && sessionActive != 0) {
         
         if (sessionAdmin == 1) {
-            console.log("returned admin from session.php");
-            // show logout, profile, products, customers, vouchers / hide register, login, shopping cart
-            /* $("#logout").show();
-            $("#profile").show();
-            $("#products").show();
-            $("#customers").show();
-            $("#vouchers").show(); */
-            
+            // show logout, profile, products, customers, vouchers / hide register, login, shopping cart            
             $("#navRegister").hide();
             $("#navShoppingCart").hide();
             $("#navLogin").hide();
 
             // append welcome message with <li> and <span> to id="navSearch"
-            $("#navSearch").append("<li class='nav-item' id='navWelcomeUser'><span>Willkkommen " + sessionUsername + "!</span></li>");
+            $("#navSearch").after("<li class='nav-item' id='navWelcomeUser'><span class='nav-link'><i>Willkommen " + sessionUsername + "!</i></span></li>");
             
                 
         } else if (sessionAdmin == 0){
-    
-            console.log("returned user from session.php");
-    
-    
-            // show logout and profile / hide register, login, products, customers, vouchers
-            /* $("#logout").show();
-            $("#profile").show(); */
-    
+            // show logout, profile, shopping cart / hide register, login, products, customers, vouchers
             $("#navRegister").hide();                
             $("#navManageProducts").hide();
             $("#navManageCustomers").hide();
             $("#navManageVouchers").hide();
             $("#navLogin").hide();
+
+            // append welcome message with <li> and <span> to id="navSearch"
+            $("#navSearch").after("<li class='nav-item' id='navWelcomeUser'><span class='nav-link'><i>Willkommen " + sessionUsername + "!</i></span></li>");
     
         }
 
-
     } else {
-
-        console.log("returned guest from session.php");
-
         // show register and login / hide logout, profile, products, customers, vouchers
-        /* $("#register").show();
-        $("#login").show(); */
-
         $("#navManageProducts").hide();
         $("#navManageCustomers").hide();
         $("#navManageVouchers").hide();
@@ -94,8 +71,6 @@ function loadNavBar() {
         $("#navLougout").hide();
 
     }
-
-
     
 }
 
@@ -112,8 +87,6 @@ function loginUser() {
         // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
         return;
     }
-
-    console.log("username: " + username);
 
     password = hashPasswordWithSHA512(password);
     console.log("Login - HashedPassword before ajax call:");
@@ -134,7 +107,6 @@ function loginUser() {
             console.log(response);
             alert('Sie wurden erfolgreich eingeloggt.');
             window.location.href = "../sites/index.php";
-
 
             //if (response === "success") {
                 // Erfolgreich eingeloggt
@@ -172,18 +144,6 @@ function loginUser() {
 
 function registerUser() {
 
-    /* var salutation = validate($("#salutationRegistration").val());
-    var firstName = validate($("#firstNameRegistration").val());
-    var lastName = validate($("#lastNameRegistration").val());
-    var address = validate($("#addressRegistration").val());
-    var postcode = validate($("#postcodeRegistration").val());
-    var location = validate($("#locationRegistration").val());
-    var email = validate($("#emailRegistration").val());
-    var username = validate($("#usernameRegistration").val());
-    var password = validate($("#passwordRegistration").val());
-    var passwordConfirmed = validate($("#passwordConfirmedRegistration").val());
-    var creditCard = validate($("#creditCardRegistration").val()); */
-
     var salutation = $("#salutationRegistration").val();
     var firstName = $("#firstNameRegistration").val();
     var lastName = $("#lastNameRegistration").val();
@@ -214,8 +174,6 @@ function registerUser() {
         // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
         return;
     }
-
-    console.log("username: " + username);
 
     password = hashPasswordWithSHA512(password);
     console.log("HashedPassword before ajax call:");
@@ -294,19 +252,14 @@ function getSessionVariables() {
     $.ajax({
         type: "GET",
         url: "../../Backend/api.php" + "?getSession",
-        dataType: "html",
+        dataType: "json",
         cache: false,
+        async: false,
         success: function (response) {
 
-            console.log("Response from getSessionVariables():");
+            console.log("Response from api.php in getSessionVariables():");
             console.log(response);
-
-            // !!! BUG respons returns undefined array
-
-
-            // save responded array received via api.php
             userSession = response;
-            console.log("username returned from api.php in function.js " + userSession['sessionUsername']);
             
         },
 
@@ -316,17 +269,9 @@ function getSessionVariables() {
         }
     });
 
-   return userSession;
+    return userSession;    
 
 }
-
-    
-
-
-
-
-
-
 
 
 function hashPasswordWithSHA512(password) {
@@ -334,47 +279,6 @@ function hashPasswordWithSHA512(password) {
     return hashedPassword;
 }
 
-
-/* function validate(input) {
-    if (input == "") {
-        // add following message to div 'errorRegistration'
-        $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
-        return;
-    }
-} */
-
-
-
-/* function loadHead() {
-    $.ajax({
-        type: "GET",
-        url: "../Frontend/sites/components/head.html",
-        dataType: "html",
-        cache: false,
-        success: function (response) {
-            //$("head").html(response);
-            $("head").load("./Frontend/sites/components/head.html");
-        }
-    });
-    //$("head").load("./Frontend/sites/components/head.html");
+function filterUserTable2(filter, table, colmFrom, colTo){
+    alert("gotya");
 }
-
-function loadFooter() {
-    $.ajax({
-        type: "GET",
-        url: "../Frontend/sites/components/footer.html",
-        dataType: "html",
-        cache: false,
-        success: function (response) {
-            //$("footer").html(response);
-            $("footer").load("../Frontend/sites/components/footer.html");
-        }
-    });
-    //$("head").load("./Frontend/sites/components/head.html");
-} */
-
-/* (function() {
-    //$("head").load(".Frontend/sites/components/head.html");
-    $("nav").load("./Frontend/sites/components/nav.html");
-    $("footer").load("./Frontend/sites/components/nav.html");
-   }); */

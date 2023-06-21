@@ -1,9 +1,9 @@
 <?php
 // necessary for every session access
 session_start();
-
-require(dirname(__FILE__, 2) . "/config/dbaccess.php");
-require(dirname(__FILE__, 2) . "/logic/services/userService.php");
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path .'/backend/logic/session.php');
+require_once ($path . "backend/logic/services/userService.php");
 
 // check if DB access is available
 $con = mysqli_connect($dbhost, $dbuser, $dbpassword, $db);

@@ -59,8 +59,8 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="postcode">PLZ:</label><br>
-                            <input type="int" name="postcode" id="postcodeRegistration" placeholder="1010"
+                            <label for="postalCode">PLZ:</label><br>
+                            <input type="int" name="postalCode" id="postalCodeRegistration" placeholder="1010"
                                 class="form-control" required>
                         </div>
 

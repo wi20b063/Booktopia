@@ -1,8 +1,8 @@
 <?php
 //necessary for every session access
 session_start();
-
-require (dirname(__FILE__,2) . "..\config\dbaccess.php");
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path . '\Backend\config\dbaccess.php');
 
 // check if DB access is available
 $con = mysqli_connect($dbhost, $dbuser, $dbpassword, $db);
@@ -10,7 +10,8 @@ if(!$con){
 	echo "Datenbankverbindung fehlgeschlagen!";
 	exit();
 }
-
+$test=$tbl_book;
+echo "Datenbankverbindung erfolgrecih!";
 
 // check if user is logged in and which role he has
 /* if (isset($_SESSION["userid"]) && $_SESSION["active"] == 1) {

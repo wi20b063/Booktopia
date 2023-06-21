@@ -1,6 +1,7 @@
 <?php
 
-include "session.php";
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path .'/backend/logic/session.php');
 
 // remove all session variables
 session_unset();

@@ -1,0 +1,77 @@
+<?php
+session_start();
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path .'/backend/logic/session.php');
+require_once ($path .'/backend/logic/models/order.php');
+
+class OrderService {
+    private $con;
+    private $tbl_order;
+
+    public function __construct($con, $tbl_order) {
+        $this->con = $con;
+        $this->tbl_order = $tbl_order;
+    } 
+
+    public function createOrder(Order $order) {
+        $userId = $order->getCustomerId();
+        $productId = $order->getProductId();
+        $quantity = $order->getQuantity();
+        $totalPrice = $order->getTotalPrice();
+        $deliveryDate = $order->getDeliveryDate();
+        $orderDate = date("Y-m-d"); // set the order date as the current date
+
+        // Check if the product is available in stock
+        $checkStock = $this->checkStock($productId, $quantity);
+
+        if (!$checkStock) {
+            // Product is not available in stock
+            return false;
+        }
+
+        // Create the order with prepared statement
+        $sql = "INSERT INTO " . $this->tbl_order . " (userId, bookId, quantity, totalPrice, deliveryDate, orderDate) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->con->prepare($sql);
+        $stmt->bind_param("iiids", $userId, $productId, $quantity, $totalPrice, $deliveryDate, $orderDate);
+        $stmt->execute();
+        $stmt->close();
+
+        // Update the stock
+        $this->updateStock($productId, $quantity);
+
+        return true;
+    }
+
+    private function checkStock($booktId, $quantity) {
+        // Implement the logic to check if the product is available in stock
+        // Example:
+        // $product = $this->findProductById($productId);
+        // if ($product->getStock() >= $quantity) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
+
+        // For now, assume the product is always available in stock
+        return true;
+    }
+
+    private function updateStock($bookId, $quantity) {
+        // Implement the logic to update the stock after the order is created
+        // Example:
+        // $product = $this->findProductById($productId);
+        // $newStock = $product->getStock() - $quantity;
+        // $this->updateProductStock($productId, $newStock);
+
+        // For now, assume the stock is not updated
+    }
+
+    /* Other methods such as finding orders, updating orders, etc. can be implemented here */
+
+    public function closeConnection() {
+        $this->con->close();
+    }
+}
+
+?>
+
