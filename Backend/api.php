@@ -58,55 +58,50 @@ class Api {
             }
     }
     
+    // Verarbeitung von GET-Anfragen
+    // Hier können verschiedene GET-Anfragen an die entsprechenden Services weitergeleitet werden.
     public function processGet() {
-        // to be implemented
-
-        // Verarbeitung von GET-Anfragen
-        // Hier können verschiedene GET-Anfragen an die entsprechenden Services weitergeleitet werden.
-        // Beispiel:
 
         // login user 
-        if (isset($_GET["username"]) && isset($_GET["password"])) {
+        if (isset($_GET["loginUser"])) {
             
             // echo "<script>console.log('processGet - loginUser - in api.php reached');</script>";
             
             // Verarbeite Login
             $username = $_GET["username"];
             $password = $_GET["password"];
+            $rememberMe = $_GET["rememberMe"];
             // echo "username in api.php: " . $username . "<br>";
             // echo "password in api.php: " . $password . "<br>";
             
-            $userLoggedIn = $this->userService->loginUser($username, $password);
+            $result = $this->userService->loginUser($username, $password, $rememberMe);
 
-                if ($userLoggedIn) {
-                    // echo " user successfully logged in api.php";
-                    // $this -> success(200,  "Login erfolgreich!");
+                if ($result === true) {
+                    $this -> success(200,  "Login erfolgreich!", []);
                 } else {
-                    // echo " user not logged api.php";
-                    // $this -> error(401, "Login fehlgeschlagen!", []);                
+                    $this -> error(401, "Login fehlgeschlagen! " . $result);                
                 }
-            
-        } elseif (isset($_GET['getSession'])) {
-
-            // echo " // processGet - getSession - in api.php reached";
+        
+        
+        // geht Session Variables and check for cookie
+        } elseif (isset($_GET["getSession"])) {
 
             $userSession = $this->userService->getSession();
-
-            // echo " // username from userSession array in api.php: " . $userSession['sessionUsername'] . "//";
-
-            //return $userSession;
-
-            $this->success(200, $userSession);
+            $this->success(200, "", $userSession);
         
-        } /* elseif (isset($_GET['logout'])) {
+        // logout user
+        } elseif (isset($_GET['logoutUser'])) {
 
             echo " processGet - logoutUser - in api.php reached";
-            
-            // Verarbeite Logout
             $this->userService->logoutUser();
+            $this->success(200, "Logout erfolgreich!", []);
+            
+        } /* } elseif (isset($_GET["book"])) {
+            // Produkt erstellen
+            // $this->productService->createBook(); 
+        
+            
         } */
-
-
 
             
         /* if (isset($_GET["users"])) {
@@ -115,16 +110,12 @@ class Api {
         } elseif (isset($_GET["book"])) {
             $books = $this->bookService->findAll();
             $this->success(200, $books);
-        } else {
+        } */ else { 
             $this->error(400, [], "Bad Request - invalid parameters " . http_build_query($_GET));
-        } */
+        }
     }
     
     public function processPost() {
-        // to be implemented
-
-        // Verarbeitung von POST-Anfragen
-        // Hier können verschiedene POST-Anfragen an die entsprechenden Services weitergeleitet werden.
 
         if (empty($_POST)) {
             // Error
@@ -133,13 +124,7 @@ class Api {
         
         // register user
         elseif (isset($_POST["user"])) { 
-            // User erstellen
-            // echo "console.log('processPost - saveUser - in api.php reached');";
-            // fetch data from posted body
-            //$user = file_get_contents('php://input');
             $user = $_POST["user"];
-            // print firstname of array user
-            // echo $user["username"];
             $this->userService->saveUser($user);
         }
         
@@ -157,14 +142,8 @@ class Api {
                 } else {
                     $this -> error(401, "Login fehlgeschlagen!", []);} */
                     
-       /*  
-        } elseif (isset($_GET["book"])) {
-            // Produkt erstellen
-            // $this->productService->createBook(); 
-        
-            
-        } */ else {
-            $this->error(400, "Bad Request - invalide Parameter" . http_build_query($_GET), []);
+            else {
+                $this->error(400, "Bad Request - invalide Parameter" . http_build_query($_GET), []);
         }
     }
     
@@ -204,18 +183,29 @@ class Api {
     
 
     // format sucess response
-    private function success ($code, array $array) {
+    private function success (int $code, $message, array $array) {
+
+        if ($array == null) {
+            http_response_code($code);
+        // header('Content-Type: application/json');
+            echo($message);
+            
+        } else {
         http_response_code($code);
         // header('Content-Type: application/json');
+        echo($message);
         echo(json_encode($array));
+        }
+        
         exit;
+        
     }
     
     // format error response
-    private function error ($code, $message, $data) {
+    private function error ($code, $message) {
         http_response_code($code);
-        echo ($message);
-        
+        echo($message);
+        exit;        
     }
 }
 

@@ -1,3 +1,6 @@
+<?php include (dirname(__FILE__, 3) . "\Backend\logic\session.php");?>
+
+
 <!DOCTYPE html>
 
 <html lang="EN">

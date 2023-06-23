@@ -1,3 +1,6 @@
+<?php include (dirname(__FILE__, 3) . "\Backend\logic\session.php");?>
+
+
 <!DOCTYPE html>
 
 <html lang="EN">
@@ -53,8 +56,8 @@
                         </div>
 
                         <div class="mb-4">
-                            <input type="checkbox" id="rememberMeLogin" name="save">
-                            <label for="save">Login merken</label>
+                            <input type="checkbox" id="rememberMeLogin" name="rememberMeLogin">
+                            <label for="rememberMeLogin">Login merken</label>
                         </div>
 
                         <div class="mb-4 errors" id="errorLogin"></div>

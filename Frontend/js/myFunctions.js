@@ -21,6 +21,12 @@ $(document).ready(function () {
 
   });
 
+
+
+// ************************************************************
+//          LOAD NAVBAR
+// ************************************************************
+
 // function to define which user can see which navbar items
 function loadNavBar() {
 
@@ -37,7 +43,7 @@ function loadNavBar() {
     console.log("admin: " + sessionAdmin);
     console.log("active: " + sessionActive);
 
-    if (sessionUsername != null && sessionActive != 0) {
+    if ((sessionUsername != null || sessionUsername != undefined) && sessionActive != 0) {
         
         if (sessionAdmin == 1) {
             // show logout, profile, products, customers, vouchers / hide register, login, shopping cart            
@@ -75,72 +81,9 @@ function loadNavBar() {
 }
 
 
-function loginUser() {
-
-    var username = $("#usernameLogin").val();
-    var password = $("#passwordLogin").val();
-
-    // Client validation username and password
-    if (username == "" || password == "") {
-        console.log("Client validation failed!");
-        $("#errorLogin").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
-        // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
-        return;
-    }
-
-    password = hashPasswordWithSHA512(password);
-    console.log("Login - HashedPassword before ajax call:");
-    console.log(password); 
-
-    $.ajax({
-        type: "GET",
-        url: "../../Backend/api.php",
-        data: {
-            username: username,
-            password: password
-        },
-        dataType: "html",
-        cache: false,
-        success: function (response) {
-
-            console.log("Response from loginUser():");
-            console.log(response);
-            alert('Sie wurden erfolgreich eingeloggt.');
-            window.location.href = "../sites/index.php";
-
-            //if (response === "success") {
-                // Erfolgreich eingeloggt
-                // Hier kannst du entsprechende Aktionen durchführen, z.B. Weiterleitung zur Startseite
-
-                // Set session variable for remember me
-                /* if ($("#rememberMe").is(":checked")) {
-                    sessionStorage.setItem("username", username);
-                } */
-
-                // Redirect to index.html
-
-                //window.location.href = "../sites/index.php";
-
-            //} else if (response === "error") {
-                // Fehler beim Einloggen
-                // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
-                // Append error message to id="loginForm"
-                //$("#loginForm").append("<p style='color:red; font-weight:bold;'>Fehler beim Einloggen!</p>");
-            //} else {
-                // Ungültige Antwort
-                // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
-                //alert("Ungültige Antwort vom Server");
-            //}
-        },
-        error: function () {
-            // Fehler beim AJAX-Aufruf
-            // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
-            //$("#errorLogin").append("<p style='color:red; font-weight:bold;'>Fehler beim Login AJAX Aufruf!</p>");
-        }
-    });
-}
-
-
+// ************************************************************
+//          REGISTER USER
+// ************************************************************
 
 function registerUser() {
 
@@ -167,6 +110,8 @@ function registerUser() {
         // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
         return;
     }
+
+    // !!!! noch offen E-Mail Prüfung / password Regex / creditCard Regex
 
     if (password != passwordConfirmed) {
         console.log("Password and passwordConfirmed stimmen nicht überein!");
@@ -195,7 +140,6 @@ function registerUser() {
 
     console.log(user);
 
-
     $.ajax({
         type: "POST",
         url: "../../Backend/api.php",
@@ -218,7 +162,96 @@ function registerUser() {
 
     }
 
-    
+
+
+// ************************************************************
+//          LOGIN USER
+// ************************************************************
+
+function loginUser() {
+
+    var username = $("#usernameLogin").val();
+    var password = $("#passwordLogin").val();
+    // console.log("username: " + username);
+    //var rememberMe = $("#rememberMeLogin").prop("checked");
+    var rememberMe = $("#rememberMeLogin").is(":checked");
+    console.log("rememberMe: " + rememberMe);
+
+    // Client validation username and password
+    if (username == "" || password == "") {
+        console.log("Client validation failed!");
+        $("#errorLogin").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
+        // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+        return;
+    }
+
+    password = hashPasswordWithSHA512(password);
+    // console.log("Login - HashedPassword before ajax call:");
+    // console.log(password); 
+
+    $.ajax({
+        type: "GET",
+        url: "../../Backend/api.php" + "?loginUser",
+        data: {
+            username: username,
+            password: password,
+            rememberMe: rememberMe
+        },
+        dataType: "html",
+        cache: false,
+        success: function (response) {
+
+            console.log("Response from loginUser():");
+            console.log(response.code);
+            /* console.log("1: " + JSON.stringify(code));
+            console.log("2: " + message);
+            console.log("3: " + array); */
+            alert('Sie wurden erfolgreich eingeloggt.');
+            window.location.href = "../sites/index.php";
+
+            //if (response === "success") {
+                // Erfolgreich eingeloggt
+                // Hier kannst du entsprechende Aktionen durchführen, z.B. Weiterleitung zur Startseite
+
+                // Set session variable for remember me
+                /* if ($("#rememberMe").is(":checked")) {
+                    sessionStorage.setItem("username", username);
+                } */
+
+                // Redirect to index.html
+
+                //window.location.href = "../sites/index.php";
+
+            //} else if (response === "error") {
+                // Fehler beim Einloggen
+                // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
+                // Append error message to id="loginForm"
+                //$("#loginForm").append("<p style='color:red; font-weight:bold;'>Fehler beim Einloggen!</p>");
+            //} else {
+                // Ungültige Antwort
+                // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
+                //alert("Ungültige Antwort vom Server");
+            //}
+        },
+        error: function (e) {
+            // Fehler beim AJAX-Aufruf
+
+            var errorMessage = e.responseText;           
+            console.log(errorMessage);
+            alert(errorMessage);
+            window.location.href = "../sites/login.php";
+
+            // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
+            //$("#errorLogin").append("<p style='color:red; font-weight:bold;'>Fehler beim Login AJAX Aufruf!</p>");
+        }
+    });
+}
+
+
+
+// ************************************************************
+//          LOGOUT USER
+// ************************************************************    
 
 function logoutUser() {
 
@@ -226,24 +259,31 @@ function logoutUser() {
 
     $.ajax({
         type: "GET",
-        url: "../../Backend/logic/logout.php",
+        // url: "../../Backend/logic/logout.php",
+        url: "../../Backend/api.php" + "?logoutUser",
         dataType: "html",
         cache: false,
         success: function (response) {
             console.log("Response from logoutUser():");
             console.log(response);
-            alert('Sie wurden erfolgreich ausgeloggt.');
+            alert("Sie wurden erfolgreich ausgeloggt.");
+            window.location.href = "index.php";
         },
 
-        error: function () {
+        error: function (e) {
             // Error handling
             console.log("Error in error function of logoutUser()");
-            alert("Error in error function of logoutUser()");
+            alert("Fehler beim Ausloggen!");
         }
     });
-    window.location.href = "../sites/index.php";
 }
 
+
+
+
+// ************************************************************
+//          GET SESSION VARIABLES
+// ************************************************************
 
 function getSessionVariables() {
 
@@ -273,6 +313,10 @@ function getSessionVariables() {
 
 }
 
+
+// ************************************************************
+//          HASH PASSWORD WITH SHA512
+// ************************************************************
 
 function hashPasswordWithSHA512(password) {
     var hashedPassword = CryptoJS.SHA512(password).toString();

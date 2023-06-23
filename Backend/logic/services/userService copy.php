@@ -165,15 +165,14 @@ class UserService {
                           
                 // if rememberMe checked, set cookie to expire after 30 days
                 if ($rememberMe == "true") {
-                    
                     // echo " rememberMe checked: " . $rememberMe;
-                    //setcookie("rememberLogin", $username, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
-                    
-                    // set secure cookie with salt and encode with base64
-                    $salt = "!1salt#@"; // salt for secure cookie
-                    $encodedCookieValue = base64_encode($salt . $username);
                     // setcookie(key, value, expire, path, domain, secure, httponly);
-                    setcookie("rememberLogin", $encodedCookieValue, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
+                    setcookie("username", $username, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
+                    
+                    // set secure cookie
+                    // $token_key = hash('sha256', $username);
+                    // $token_value = hash('sha256', $password);
+                    // setcookie("SES", $token_key . ":" . $token_value, time() + (86400 * 30), "/", "localhost", true, true);
                     
                 // if rememberMe not checked, set cookie to expire after 30 minutes and when closing browser
                 } else {
@@ -211,10 +210,10 @@ class UserService {
         session_destroy();        
 
         // unset cookies
-        if (isset($_COOKIE['rememberLogin'])) {
-            echo " // Unset cookie: " . $_COOKIE['rememberLogin'];
+        if (isset($_COOKIE['username'])) {
+            echo " // Unset cookie: " . $_COOKIE['username'];
             // unset($_COOKIE['username']);
-            setcookie("rememberLogin", "", time() - 3600, "/"); // 86400 = 1 day / secure, http only
+            setcookie("username", "", time() - 3600, "/"); // 86400 = 1 day / secure, http only
         }       
 
         return true;
@@ -249,24 +248,17 @@ class UserService {
             
             return $userSession;
 
-        } elseif (isset($_COOKIE["rememberLogin"])) {
+        } elseif (isset($_COOKIE["username"])) {
             
             // echo " // COOKIE SET: " . $_COOKIE["username"];
 
-            $encodedCookieRememberLogin = $_COOKIE["rememberLogin"];
-
-            $decodedCookieRememberLogin = base64_decode($encodedCookieRememberLogin);
-            // $decodedSalt = substr($decodedCookieRememberLogin, 0, 8);
-            $decodedUsernameFromCookie = substr($decodedCookieRememberLogin, 8);
-
-            // echo " // decodedSalt: " . $decodedSalt;
-            // echo " // decodedCookieRememberLogin: " . $decodedUsernameFromCookie;
+            $cookieUsername = $_COOKIE["username"];
 
             // check if user exists with prepared statement
             $sql = "SELECT * FROM user WHERE username = ?";
             // $sql = "SELECT * FROM user WHERE username = ? LIMIT 1";
             $stmt = $this->con->prepare($sql);
-            $stmt->bind_param("s", $decodedUsernameFromCookie);
+            $stmt->bind_param("s", $cookieUsername);
             $stmt->execute();
             $result = $stmt->get_result();
             $row = $result->fetch_assoc();

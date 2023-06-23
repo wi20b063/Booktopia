@@ -53,7 +53,7 @@
                 <a class="nav-link" href="../sites/login.php">Login</a>
             </li>
             <li class="nav-item" id="navLougout">
-                <a class="nav-link" href="../../Backend/logic/logout.php">Logout</a>
+                <a class="nav-link" href="#">Logout</a>
             </li>
         </ul>
 
