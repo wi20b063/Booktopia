@@ -14,18 +14,29 @@ $(document).ready(function () {
         registerUser();
     });
 
-    $("#navLogout").on("click", function() {
+    $("#navLougout").on("click", function() {
         console.log("logoutUser() called");
         logoutUser();
     });
 
-    // load user data in profile.php
     loadUserData();
+
+    /* $("#btnEditProfile").on("click", function() {
+        var elements = document.getElementsByTagName("input");
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].disabled = false;
+        }
+    }); */
     
     $("#btnEditProfile").on("click", function() {
-        var elementsInput = document.getElementsByClassName("editableProfile");
+        var elementsInput = document.getElementsByTagName("input");
         for (var i = 0; i < elementsInput.length; i++) {
             elementsInput[i].disabled = false;
+        }
+
+        var elementsSelect = document.getElementsByTagName("select");
+        for (var i = 0; i < elementsSelect.length; i++) {
+            elementsSelect[i].disabled = false;
         }
 
         $("#btnEditProfile").hide();
@@ -39,17 +50,8 @@ $(document).ready(function () {
     
     });
 
-    // load order overview for customer in orderOverviewCustomer.php
-    loadOrderOverviewCustomer();
-
-    // when clicked button from class showInvoiceCustomer fill page invoice.php
-    $(".showInvoiceCustomer").on("click", function() {
-        var invoiceForOrderNo = $(this).attr("id");
-        createInvoice(invoiceForOrderNo);
-    });
-
     
-});
+  });
 
 
 
@@ -104,7 +106,7 @@ function loadNavBar() {
         $("#navManageCustomers").hide();
         $("#navManageVouchers").hide();
         $("#navMyAccountDropdown").hide();
-        $("#navLogout").hide();
+        $("#navLougout").hide();
 
     }
     
@@ -430,13 +432,13 @@ function saveEditedUserData() {
 
     var passwordForSavingProfile = prompt("Bitte geben Sie Ihr Passwort ein:");
     passwordForSavingProfile = hashPasswordWithSHA512(passwordForSavingProfile);
-    var passwordCheck = checkPasswordForSavingProfile(passwordForSavingProfile);
+    var passwordCheck = checkPassworfForSavingProfile(passwordForSavingProfile);
 
     // alert("passwordCheck: " + passwordCheck);
     console.log("passwordCheck in saveEditedUserData: " + passwordCheck);
 
-    // if entered password matches password in database save edited user data
     if (passwordCheck) {
+        
         alert("Passwort korrekt!");
 
         var salutation = $("#salutationProfile").val();
@@ -452,7 +454,7 @@ function saveEditedUserData() {
         // var active = $("#activeProfile").val();
         // var admin = $("#adminProfile").val();
 
-        if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "" || creditCard == "") {
+        if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "" || passwordConfirmed == "" || creditCard == "") {
             console.log("Client validation failed!");
             $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
             // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
@@ -486,33 +488,36 @@ function saveEditedUserData() {
         }
 
         $.ajax({
-            type: "PUT",
-            url: "../../Backend/api.php" + "?saveEditedUserData",
+            type: "POST",
+            url: "../../Backend/api.php",
             data: {
-                editedUser: editedUser
+                user: editedUser
             },
             dataType: "html",
             cache: false,
             success: function (response) {
     
-                console.log("Response from saveEditedUserData():");
+                console.log("Response from registerUser():");
                 console.log(response);
-                alert('Nutzerdaten wurden erfolgreich geändert.');
-                window.location.href = "../sites/profile.php";
+                alert('Sie wurden erfolgreich registriert, bitte loggen Sie sich ein, um fortzufahren.');
+                window.location.href = "../sites/index.php";
     
             },
             error: function () {
             }
         });
-        
+
     } else {
 
         alert("Falsches Passwort!");
 
-    }
+        // TO DO Funktion regsiterUser anpassen
+
+    }   
+    
 
     
-}
+        
 
 
 
@@ -520,7 +525,7 @@ function saveEditedUserData() {
 //          CHECK PASSWORD FOR SAVING PROFILE
 // ************************************************************
 
-function checkPasswordForSavingProfile(passwordForSavingProfile) {
+function checkPassworfForSavingProfile(passwordForSavingProfile) {
 
     var passwordCheck = null;
 
@@ -535,7 +540,7 @@ function checkPasswordForSavingProfile(passwordForSavingProfile) {
         async: false,
         success: function (response) {
             passwordCheck = response;
-            console.log("passwordCheck 1 in checkPasswordForSavingProfile(): " + passwordCheck);
+            console.log("passwordCheck 1 in checkPassworfForSavingProfile(): " + passwordCheck);
 
         },
         error: function (e) {
@@ -545,167 +550,9 @@ function checkPasswordForSavingProfile(passwordForSavingProfile) {
     });
 
     return passwordCheck;   
+
     
 }
-
-
-
-// ************************************************************
-//          LOAD ORDER OVERVIEW FOR CUSTOMER
-// ************************************************************
-
-function loadOrderOverviewCustomer() {
-
-    // get array with order data
-    var orderData = getOrderData();
-
-    // get every items from array by iterating through it and append it to table
-    for (var i = 0; i < orderData.length; i++) {
-        var orderNumber = orderData['orderNumber'];
-        var orderDate = orderData['orderDate'];
-        var orderStatus = orderData['orderStatus'];
-        var orderDeliverDate = orderData['orderDeliverDate'];
-        var orderTotal = orderData['orderTotal'];
-        var orderDetails = orderData['orderDetails'];
-
-        $("#orderOverviewCustomerTable").append("<tr><td>" + orderNumber + "</td><td>" + orderDate + "</td><td class='orderStatus'"
-         + orderStatus + ">" + orderStatus + "</td><td>" + orderDeliverDate + "</td><td>" + orderTotal + "</td><td>" 
-         + orderDetails + "</td><td><button type='button' id='invoiceOrderNo" + orderNumber + "' class='btn btn-primary showInvoiceCustomer'>Rechnung drucken</button></td></tr>");
-    }
-}
-
-
-// ************************************************************
-//          GET ALL ORDER DATA
-// ************************************************************
-
-function getOrderData() {
-
-    var orderData = [];
-
-    $.ajax({
-        type: "GET",
-        url: "../../Backend/api.php" + "?getOrderData",
-        dataType: "json",
-        cache: false,
-        async: false,
-        success: function (response) {
-
-            console.log("Response from api.php in getUserData():");
-            console.log(response);
-            userData = response;
-            
-        },
-
-        error: function () {
-            // Error handling
-            console.log("Error in error function of getUserData()");
-        }
-    });
-
-    return orderData;    
-
-}
-
-// ************************************************************
-//          GET ORDER DATA BY ORDER NO
-// ************************************************************
-
-function getOrderData(orderNo) {
-
-    var orderData = [];
-
-    $.ajax({
-        type: "GET",
-        url: "../../Backend/api.php" + "?getOrderDataByOrderNo",
-        data: {
-            orderNo: orderNo
-        },
-        dataType: "json",
-        cache: false,
-        async: false,
-        success: function (response) {
-
-            console.log("Response from api.php in getUserData():");
-            console.log(response);
-            userData = response;
-            
-        },
-
-        error: function () {
-            // Error handling
-            console.log("Error in error function of getUserData()");
-        }
-    });
-
-    return orderData;    
-
-}
-
-
-// ************************************************************
-//          CREATE INVOICE PAGE
-// ************************************************************
-
-function createInvoice(invoiceForOrderNo) {
-
-    // add customer data to invoice
-    var customerData = getCustomerData();
-    var customerSalutation = customerData['salutation'];
-    var customerFirstName = customerData['firstName'];
-    var customerLastName = customerData['lastName'];
-    var customerAddress = customerData['address'];
-    var customerPostcode = customerData['postcode'];
-    var customerLocation = customerData['location'];
-    var customerId = customerData['userid'];
-
-    $("#invoiceCustomerSalutation").val(customerSalutation);
-    $("#invoiceCustomerName").val(customerFirstName + " " + customerLastName);
-    $("#invoiceCustomerAddress").val(customerAddress);
-    $("#invoiceCustomerZIPLocation").val(customerPostcode + " " + customerLocation);
-
-    // create random invoice number
-    var min = 1;
-    var max = 100;
-    var randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-
-    // date today
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
-
-    $("#invoiceNumber").val("Rechnungs-Nr.: " + randomNumber);
-    $("#invoiceDate").val("Rechnungsdatum: " + dd + "." + addLeadingZero(mm) + "." + addLeadingZero(yyyy));
-    $("#customerId").val("Kunden-Nr.: " + customerId);
-
-    // get array with order data
-    var orderData = getOrderDataById(invoiceForOrderNo);
-
-    // get every items from array by iterating through it and append it to table
-    for (var i = 0; i < orderData.length; i++) {
-/*         var orderNumber = orderData['orderNumber'];
-        var orderDate = orderData['orderDate'];
-        var orderStatus = orderData['orderStatus'];
-        var orderDeliverDate = orderData['orderDeliverDate'];
-        var orderTotal = orderData['orderTotal'];
-        var orderDetails = orderData['orderDetails']; */
-        var orderPosition = orderData['orderPosition'];
-
-        // get information for every order position by iterating through it and append it to table
-        for (var j = 0; j < orderPosition.length; j++) {
-            var orderPositionArticleNo = orderPosition['articleNo'];
-            var orderPositionArticleName = orderPosition['articleName'];
-            var orderPositionArticlePrice = orderPosition['articlePrice'];
-            var orderPositionArticleQuantity = orderPosition['articleQuantity'];
-            var orderPositionArticleTotal = orderPositionArticleQuantity * orderPositionArticlePrice;
-
-            $("#invoiceTableBody").append("<tr><td>" + (j+1) + "</td><td>" + orderPositionArticleNo + "</td><td>" + orderPositionArticleName + "</td><td>" + orderPositionArticlePrice + " EUR</td><td>" + orderPositionProductQuantity + "</td><td class='totalPricePerPosition'>" + orderPositionArticleTotal + " EUR</td></tr>");
-        }
-    }
-}
-
-
 
 
 

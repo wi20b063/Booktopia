@@ -1,4 +1,4 @@
-<?php include (dirname(__FILE__, 3) . "\Backend\logic\session.php");?>
+<?php //include (dirname(__FILE__, 3) . "\Backend\logic\session.php");?>
 
 
 <!DOCTYPE html>

@@ -123,10 +123,12 @@ class UserService {
                 // echo "<script>alert('Bitte loggen Sie sich ein, um fortzufahren.');</script>";
             } else {
                 // error - user not created
-                echo " ERROR - User not created";
+                echo " Fehler: Nutzer wurde nicht erstellt.";
             }
         }
-    } 
+    }
+    
+    
 
     // ************************************************************
     //          LOGIN USER
@@ -200,6 +202,12 @@ class UserService {
     }
 
     
+
+    // ************************************************************
+    //          LOGOUT USER
+    // ************************************************************
+
+    
     public function logoutUser() {
 
         echo " logoutUser in userServie.php reached";
@@ -218,6 +226,53 @@ class UserService {
         }       
 
         return true;
+    }
+
+
+    // ************************************************************
+    //          GET USER DATA
+    // ************************************************************
+    
+    // get user data
+    public function getUserData() {
+
+        $userData = array();
+
+        if (isset($_SESSION["username"])) {
+
+            $username = $_SESSION["username"];
+
+            // check if user exists with prepared statement
+            $sql = "SELECT * FROM user WHERE username = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            
+            if ($result->num_rows > 0) {
+
+                $userData["salutation"] = $row['salutation'];
+                $userData["firstName"] = $row['firstName'];
+                $userData["lastName"] = $row['lastName'];
+                $userData["address"] = $row['address'];
+                $userData["postcode"] = $row['postcode'];
+                $userData["location"] = $row['location'];
+                $userData["email"] = $row['email'];
+                $userData["username"] = $row['username'];
+                $userData["password"] = $row['password'];
+                $userData["creditCard"] = $row['creditCard'];
+                $userData["active"] = $row['active'];
+                $userData["admin"] = $row['admin'];
+
+                // return $userData;
+            }
+            
+            // return $userData;
+            
+        }
+        
+        return $userData;
 
     }
 
@@ -289,6 +344,156 @@ class UserService {
             return $userSession;
                         
         }
+    }
+
+
+    // ************************************************************
+    //          CHECK PASSWORD
+    // ************************************************************
+
+    // check password
+    public function checkPassword($passwordToBeChecked) {
+
+        if (isset($_SESSION["username"])) {
+            $username = $_SESSION["username"];
+
+            // check if user exists with prepared statement
+            $sql = "SELECT * FROM user WHERE username = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            
+            if ($result->num_rows > 0) {
+
+                // User exists            
+                // check if password is correct with prepared statement (password is sha256 hashed)
+                $sql = "SELECT * FROM user WHERE username = ? AND password = ?";
+                $stmt = $this->con->prepare($sql);
+                $stmt->bind_param("ss", $username, $passwordToBeChecked);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                
+                if ($result->num_rows > 0) {
+
+                    // password correct
+                    return true;
+                    
+                } else {
+                    // password incorrect
+                    // error - password incorrect
+                    return "Passwort ist nich korrekt.";
+                }
+            } else {
+                // error - user not found
+                return "Username wurde nicht gefunden. Bitte einloggen.";
+            }
+            
+            
+        }
+        
+    }
+
+
+    // ************************************************************
+    //          SAVE EDITED USER PROFILE
+    // ************************************************************
+    
+    public function saveEditedUserData($usereditedUser) {
+
+        // get data from array
+        $salutation = $usereditedUser['salutation'];
+        $firstName = $usereditedUser['firstName'];
+        $lastName = $usereditedUser['lastName'];
+        $address = $usereditedUser['address'];
+        $postcode = $usereditedUser['postcode'];
+        $location = $usereditedUser['location'];
+        $email = $usereditedUser['email'];
+        $username = $usereditedUser['username'];
+        $password = $usereditedUser['password'];
+        $creditCard = $usereditedUser['creditCard'];
+
+        // check if user already exists with prepared statement
+        $sql = "SELECT * FROM user WHERE username = ?";
+        $stmt = $this->con->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+                
+        if ($result->num_rows > 0) {
+            // User already exists            
+            
+            // update user with prepared statement
+            $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, creditCard = ?, email = ? WHERE username = ?";
+            $stmt = $this->con->prepare($sqlUpd);
+            $stmt->bind_param("sssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->affected_rows > 0) {
+                // user updated
+                header("Refresh:0; url=../profile.php");
+            } else {
+                // error - user not updated
+                echo " // Fehler: Nutzerdaten konnten nicht aktualisiert werden.";
+            }
+            
+        } else {
+            echo " // Nutzer existiert nicht.";
+        }
+
+        
+    }
+
+
+    // ************************************************************
+    //          GET ORDER DATA
+    // ************************************************************
+    
+    // get user data
+    public function getOrderData() {
+
+        $orderData = array();
+
+        if (isset($_SESSION["username"])) {
+
+            $username = $_SESSION["username"];
+
+            // check if user exists with prepared statement
+            $sql = "SELECT * FROM user WHERE username = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            
+            if ($result->num_rows > 0) {
+
+                // user exits: get all orders from this user with prepared statement and save in array
+                
+                $sql = "SELECT * FROM orders WHERE userid = ?";
+                $stmt = $this->con->prepare($sql);
+                $stmt->bind_param("i", $row['userid']);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                
+                // save array with orders in $orderData
+                $orderData = $result->fetch_all(MYSQLI_ASSOC);
+                
+                
+
+                // return $orderData;
+            }
+            
+            // return $orderData;
+            
+        }
+        
+        return $orderData;
+
     }
 
        

@@ -46,13 +46,22 @@
             <li class="nav-item" id="navShoppingCart">
                 <a class="nav-link" href="#">Warenkorb</a>
             </li>
-            <li class="nav-item" id="navProfile">
+            <!-- <li class="nav-item" id="navProfile">
                 <a class="nav-link" href="#">Mein Konto</a>
+            </li> -->
+            <li class="nav-item dropdown" id="navMyAccountDropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Mein Konto</a>
+                <ul class="dropdown-menu dropdown-menu-end" id="navbar-dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" id="navProfile" href=" ../sites/profile.php">Profil</a></li>
+                    <li><a class="dropdown-item" href="../sites/orderOverviewCustomer.php">Bestellungen</a></li>
+                    <!-- <li><a class="dropdown-item" href="../sites/invoiceOverviewCustomer.php">Rechnungen</a></li> -->
+                </ul>
             </li>
             <li class="nav-item" id="navLogin">
                 <a class="nav-link" href="../sites/login.php">Login</a>
             </li>
-            <li class="nav-item" id="navLougout">
+            <li class="nav-item" id="navLogout">
                 <a class="nav-link" href="#">Logout</a>
             </li>
         </ul>

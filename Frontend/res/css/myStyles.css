@@ -88,3 +88,17 @@ footer {
     margin-top: 150px;
     padding: 20px;
 }
+
+/* END styling of footer */
+
+/* START styling of order status */
+
+.orderStatusGeliefert {
+    background-color: lightgreen;
+}
+
+.orderStatusStorniert {
+    background-color: lightpink;
+}
+
+

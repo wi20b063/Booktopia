@@ -57,6 +57,12 @@ class Api {
                     $this->error(405, ["Allow: GET, POST, DELETE"], "Method not allowed");                
             }
     }
+
+    
+
+    // ************************************************************
+    //          GET REQUESTS
+    // ************************************************************
     
     // Verarbeitung von GET-Anfragen
     // Hier können verschiedene GET-Anfragen an die entsprechenden Services weitergeleitet werden.
@@ -89,6 +95,18 @@ class Api {
             $userSession = $this->userService->getSession();
             $this->success(200, "", $userSession);
         
+        // get user data
+        } elseif (isset($_GET["getUserData"])) {
+
+            $userData = $this->userService->getUserData();
+            $this->success(200, "", $userData);
+            
+        // get order data
+        } elseif (isset($_GET["getOrderData"])) {
+
+            $orderData = $this->userService->getOrderData();
+            $this->success(200, "", $orderData);
+        
         // logout user
         } elseif (isset($_GET['logoutUser'])) {
 
@@ -96,6 +114,18 @@ class Api {
             $this->userService->logoutUser();
             $this->success(200, "Logout erfolgreich!", []);
             
+        } elseif (isset($_GET["checkPasswordForSavingProfile"])) {
+
+            $passwordForSavingProfile = $_GET["passwordForSavingProfile"];
+            $result = $this->userService->checkPassword($passwordForSavingProfile);
+
+                if ($result === true) {
+                    $this -> success(200,  "true", []);
+                } else {
+                    $this -> error(401, $result);                
+                }
+        
+        
         } /* } elseif (isset($_GET["book"])) {
             // Produkt erstellen
             // $this->productService->createBook(); 
@@ -114,6 +144,11 @@ class Api {
             $this->error(400, [], "Bad Request - invalid parameters " . http_build_query($_GET));
         }
     }
+
+    
+    // ************************************************************
+    //          POST REQUESTS
+    // ************************************************************
     
     public function processPost() {
 
@@ -125,10 +160,10 @@ class Api {
         // register user
         elseif (isset($_POST["user"])) { 
             $user = $_POST["user"];
-            $this->userService->saveUser($user);
-        }
+            $this->userService->saveUser($user);        
         
-        /* else if (isset($_POST["username"]) && isset($_POST["password"])) {
+        // Check if entered password is correct
+        } /* else if (isset($_POST["username"]) && isset($_POST["password"])) {
             
             echo "<script>console.log('processPost - loginUser - in api.php reached');</script>";
             
@@ -165,15 +200,11 @@ class Api {
     }
 
     private function processUpdate() {
-        // to be implemented
-        
-        // Verarbeitung von PUT-Anfragen (Update)
-        // Hier können verschiedene PUT-Anfragen an die entsprechenden Services weitergeleitet werden.
 
-        /* if (isset($_GET["user"])) {
-            // Verarbeite Benutzer aktualisieren
-            // $this->userService->updateUser();
-        } elseif (isset($_GET["book"])) {
+        if (isset($PUT["saveEditedUserData"])) {             
+            $editedUser = $PUT["editedUser"];
+            $this->userService->saveEditedUserData($editedUser);
+        } /* elseif (isset($_GET["book"])) {
             // Verarbeite Produkt aktualisieren
             // $this->productService->updateBook();
         } else {
