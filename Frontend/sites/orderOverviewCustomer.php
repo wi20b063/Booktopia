@@ -32,7 +32,7 @@
                             <th scope="col">Bestellstatus</th>
                             <th scope="col">Lieferdatum</th>
                             <th scope="col">Gesamtpreis</th>
-                            <th scope="col">Details (Auflistung der bestellten Bücher)</th>
+                            <th scope="col">Details</th>
                             <th scope="col">Rechnung</th>
                         </tr>
                     </thead>
@@ -43,20 +43,30 @@
                             <td>Geliefert</td>
                             <td>10.05.2023</td>
                             <td>23 EUR</td>
-                            <td>Der mit dem Wolf tanzt, Verliebt in dich, ...</td>
                             <td><button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#showInvoiceCustomer">Rechnung drucken</button>
+                                    data-bs-target="#showOrderDetails" name="showOrderDetails"
+                                    id="showOrderDetails">Details</button>
+                            </td>
+                            <td><button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#showInvoiceCustomer" name="showInvoiceCustomer"
+                                    id="showInvoiceCustomer">Rechnung
+                                    drucken</button>
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">2</th>
+                            <th scope=" row">2</th>
                             <td>26.05.2023</td>
                             <td>Storniert</td>
                             <td>02.06.2023</td>
                             <td>10 EUR</td>
-                            <td>Winnie Puuh</td>
                             <td><button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#showInvoiceCustomer">Rechnung drucken</button>
+                                    data-bs-target="#showOrderDetails" name="showOrderDetails"
+                                    id="showOrderDetails">Details</button>
+                            </td>
+                            <td><button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#showInvoiceCustomer" name="showInvoiceCustomer"
+                                    id="showInvoiceCustomer">Rechnung
+                                    drucken</button>
                             </td>
                         </tr>
                         <tr>
@@ -65,10 +75,18 @@
                             <td>Offen</td>
                             <td>26.06.2023</td>
                             <td>13 EUR</td>
-                            <td>Das Haus am Meer</td>
                             <td><button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#showInvoiceCustomer">Rechnung drucken</button>
+                                    data-bs-target="#showOrderDetails" name="showOrderDetails"
+                                    id="showOrderDetails">Details</button>
                             </td>
+                            <td><button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#showInvoiceCustomer" name="showInvoiceCustomer"
+                                    id="showInvoiceCustomer">Rechnung
+                                    drucken</button>
+                            </td>
+
+                            <!-- Moda for order details -->
+                            <div class="container" id="modalOrderDetails"></div>
                         </tr>
                     </tbody>
                 </table>
@@ -77,7 +95,7 @@
 
     </main>
 
-    <footer class="py-3 my-4 fixed-bottom">
+    <footer class=" py-3 my-4 fixed-bottom">
         <?php include "components/footer.php";?>
     </footer>
 

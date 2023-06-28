@@ -34,7 +34,7 @@ class Api {
 
     
     public function processRequest() {
-        $method = $_SERVER['REQUEST_METHOD'];   // GET, POST, DELETE
+        $method = $_SERVER['REQUEST_METHOD'];   // GET, POST, DELETE, PUT
             switch ($method) {
     
                 case "GET":
@@ -102,15 +102,15 @@ class Api {
             $this->success(200, "", $userData);
             
         // get order data
-        } elseif (isset($_GET["getOrderData"])) {
+        /* } elseif (isset($_GET["getOrderData"])) {
 
             $orderData = $this->userService->getOrderData();
-            $this->success(200, "", $orderData);
+            $this->success(200, "", $orderData); */
         
         // logout user
         } elseif (isset($_GET['logoutUser'])) {
 
-            echo " processGet - logoutUser - in api.php reached";
+            // echo " processGet - logoutUser - in api.php reached";
             $this->userService->logoutUser();
             $this->success(200, "Logout erfolgreich!", []);
             
@@ -162,25 +162,22 @@ class Api {
             $user = $_POST["user"];
             $this->userService->saveUser($user);        
         
-        // Check if entered password is correct
-        } /* else if (isset($_POST["username"]) && isset($_POST["password"])) {
-            
-            echo "<script>console.log('processPost - loginUser - in api.php reached');</script>";
-            
-            // Verarbeite Login
-            $username = $_POST["username"];
-            $password = $_POST["password"];
-            $userLoggedIn = $this -> userService -> loginUser($username, $password);
-
-                if ($userLoggedIn) {
-                    $this -> success(200,  "Login erfolgreich!");
-                } else {
-                    $this -> error(401, "Login fehlgeschlagen!", []);} */
+        // Update User
+        } if (isset($_POST["saveEditedUserData"])) {             
+            $editedUser = $_POST["editedUser"];
+            // echo "saveEditedUserData in api.php reached";
+            // echo "editedUser in api.php: " . $editedUser["firstname"] . "<br>";
+            $this->userService->saveEditedUserData($editedUser);
                     
-            else {
+           } else {
                 $this->error(400, "Bad Request - invalide Parameter" . http_build_query($_GET), []);
         }
     }
+
+
+    // ************************************************************
+    //          DELETE REQUESTS
+    // ************************************************************
     
     public function processDelete() {
         // to be implemented
@@ -199,10 +196,14 @@ class Api {
         } */
     }
 
+
+    // ************************************************************
+    //          PUT REQUESTS
+    // ************************************************************
     private function processUpdate() {
 
-        if (isset($PUT["saveEditedUserData"])) {             
-            $editedUser = $PUT["editedUser"];
+        /* if (isset($_PUT["saveEditedUserData"])) {             
+            $editedUser = $_PUT["editedUser"];
             $this->userService->saveEditedUserData($editedUser);
         } /* elseif (isset($_GET["book"])) {
             // Verarbeite Produkt aktualisieren
@@ -226,8 +227,7 @@ class Api {
         // header('Content-Type: application/json');
         echo($message);
         echo(json_encode($array));
-        }
-        
+        }        
         exit;
         
     }

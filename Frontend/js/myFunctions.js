@@ -5,17 +5,17 @@ $(document).ready(function () {
 
     // when clicked button with id="btnSubmitLogin" in login.php call function loginUser()"
     $("#btnSubmitLogin").on("click", function() {
-        console.log("loginUser() called");
+        // console.log("loginUser() called");
         loginUser();
     });
 
     $("#btnSubmitRegistration").on("click", function () {
-        console.log("registerUser() called");
+        // console.log("registerUser() called");
         registerUser();
     });
 
     $("#navLogout").on("click", function() {
-        console.log("logoutUser() called");
+        // console.log("logoutUser() called");
         logoutUser();
     });
 
@@ -23,24 +23,26 @@ $(document).ready(function () {
     loadUserData();
     
     $("#btnEditProfile").on("click", function() {
+        // make profile form fields editable
         var elementsInput = document.getElementsByClassName("editableProfile");
         for (var i = 0; i < elementsInput.length; i++) {
             elementsInput[i].disabled = false;
         }
 
+        // hide button "Bearbeiten" + create button "save" and "cancel"
         $("#btnEditProfile").hide();
         $("#buttonDivProfile").append("<button type='submit' class='btn btn-primary' id='btnSaveProfile'>Speichern</button>");
+        $("#buttonDivProfile").append("&nbsp;&nbsp;<a href='profile.php' class='btn btn-secondary' id='btnCancelEditeProfile'>Abbrechen</a>");
 
         $("#btnSaveProfile").on("click", function() {
             // var passwordForSavingProfile = prompt("Bitte geben Sie Ihr Passwort ein:");
-            saveEditedUserData();
-    
+            saveEditedUserData();    
         });
     
     });
 
     // load order overview for customer in orderOverviewCustomer.php
-    loadOrderOverviewCustomer();
+    // loadOrderOverviewCustomer();
 
     // when clicked button from class showInvoiceCustomer fill page invoice.php
     $(".showInvoiceCustomer").on("click", function() {
@@ -129,9 +131,9 @@ function registerUser() {
     var passwordConfirmed = $("#passwordConfirmedRegistration").val();
     var creditCard = $("#creditCardRegistration").val();
     
-    console.log("registerUser() called");
-    console.log("password: " + password);
-    console.log("passwordConfirmed: " + passwordConfirmed);
+    // console.log("registerUser() called");
+    // console.log("password: " + password);
+    // console.log("passwordConfirmed: " + passwordConfirmed);
 
     // Client validation
     if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "" || passwordConfirmed == "" || creditCard == "") {
@@ -151,8 +153,8 @@ function registerUser() {
     }
 
     password = hashPasswordWithSHA512(password);
-    console.log("HashedPassword before ajax call:");
-    console.log(password);
+    // console.log("HashedPassword before ajax call:");
+    // console.log(password);
     
     var user = {
         salutation: salutation,
@@ -231,8 +233,8 @@ function loginUser() {
         cache: false,
         success: function (response) {
 
-            console.log("Response from loginUser():");
-            console.log(response.code);
+            // console.log("Response from loginUser():");
+            // console.log(response.code);
             /* console.log("1: " + JSON.stringify(code));
             console.log("2: " + message);
             console.log("3: " + array); */
@@ -294,8 +296,8 @@ function logoutUser() {
         dataType: "html",
         cache: false,
         success: function (response) {
-            console.log("Response from logoutUser():");
-            console.log(response);
+            //console.log("Response from logoutUser():");
+            // console.log(response);
             alert("Sie wurden erfolgreich ausgeloggt.");
             window.location.href = "index.php";
         },
@@ -327,8 +329,8 @@ function getSessionVariables() {
         async: false,
         success: function (response) {
 
-            console.log("Response from api.php in getSessionVariables():");
-            console.log(response);
+            // console.log("Response from api.php in getSessionVariables():");
+            // console.log(response);
             userSession = response;
             
         },
@@ -367,7 +369,7 @@ function loadUserData() {
     var admin = profileUserData['admin'];
 
 
-    console.log("userDataUsername: " + username);
+    // console.log("userDataUsername: " + username);
 
     $("#salutationProfile").val(salutation);
     $("#firstNameProfile").val(firstName);
@@ -384,7 +386,6 @@ function loadUserData() {
 
     // add input after label
     // $("#firstNameProfileDiv").append("<input type='text' name='firstName' id='firstNameProfile' placeholder='" + firstName + "' class='form-control' disabled>");
-
 
 }
 
@@ -405,7 +406,7 @@ function getUserData() {
         async: false,
         success: function (response) {
 
-            console.log("Response from api.php in getUserData():");
+            // console.log("Response from api.php in getUserData():");
             console.log(response);
             userData = response;
             
@@ -417,8 +418,7 @@ function getUserData() {
         }
     });
 
-    return userData;    
-
+    return userData;
 }
 
 
@@ -441,6 +441,7 @@ function saveEditedUserData() {
 
         var salutation = $("#salutationProfile").val();
         var firstName = $("#firstNameProfile").val();
+        console.log("firstName to be changed: " + firstName);
         var lastName = $("#lastNameProfile").val();
         var address = $("#addressProfile").val();
         var postcode = $("#postcodeProfile").val();
@@ -461,12 +462,6 @@ function saveEditedUserData() {
 
         // !!!! noch offen E-Mail Prüfung / password Regex / creditCard Regex
 
-        /* if (password != passwordConfirmed) {
-            console.log("Password and passwordConfirmed stimmen nicht überein!");
-            $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Passwörter stimmen nicht überein!</p>");
-            // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
-            return;
-        } */
 
         password = hashPasswordWithSHA512(password);
     
@@ -486,7 +481,7 @@ function saveEditedUserData() {
         }
 
         $.ajax({
-            type: "PUT",
+            type: "POST",
             url: "../../Backend/api.php" + "?saveEditedUserData",
             data: {
                 editedUser: editedUser
@@ -495,8 +490,8 @@ function saveEditedUserData() {
             cache: false,
             success: function (response) {
     
-                console.log("Response from saveEditedUserData():");
-                console.log(response);
+                // console.log("Response from saveEditedUserData():");
+                // console.log(response);
                 alert('Nutzerdaten wurden erfolgreich geändert.');
                 window.location.href = "../sites/profile.php";
     
@@ -535,7 +530,7 @@ function checkPasswordForSavingProfile(passwordForSavingProfile) {
         async: false,
         success: function (response) {
             passwordCheck = response;
-            console.log("passwordCheck 1 in checkPasswordForSavingProfile(): " + passwordCheck);
+            // console.log("passwordCheck 1 in checkPasswordForSavingProfile(): " + passwordCheck);
 
         },
         error: function (e) {
@@ -579,7 +574,7 @@ function loadOrderOverviewCustomer() {
 //          GET ALL ORDER DATA
 // ************************************************************
 
-function getOrderData() {
+/* function getOrderData() {
 
     var orderData = [];
 
@@ -605,13 +600,13 @@ function getOrderData() {
 
     return orderData;    
 
-}
+} */
 
 // ************************************************************
 //          GET ORDER DATA BY ORDER NO
 // ************************************************************
 
-function getOrderData(orderNo) {
+/* function getOrderData(orderNo) {
 
     var orderData = [];
 
@@ -640,14 +635,87 @@ function getOrderData(orderNo) {
 
     return orderData;    
 
-}
+} */
+
+
+// ************************************************************
+//          SHOW ORDER DETAILS IN MODAL
+// ************************************************************
+
+/* function showOrderDetails(ID) {
+
+    $orderDetails = getOrderDataById(ID);
+
+
+    // append order data to modal "modalOrderDetails"
+    $("modalOrderDetails").append(
+        "<div class='modal fade' id='showDetails'" + ID + "tabindex='-1' role='dialog' aria-labelledby='statusModalLabel' aria-hidden='true'>
+            <div class='modal-dialog' role='document'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <h5 class='modal-title'>Bestelldetails</h5>
+                        <input type='hidden' id='reservationIDstatus' name='reservationIDstatus' value='" + ID + "'></input>
+                    </div>
+                    <div class='modal-body'>                            
+                        <div class='row mb-5 gx-5'>
+                            <div class='mb-5 mb-xxl-0'>
+                                <div class='bg-secondary-soft px-4 py-5 rounded'>
+                                    <div class='row'>
+                                        <h4 class='mb-4 mt-0'>Bestelldetails</h4>
+                                        <div class='col-md-6'>
+                                            <p><strong>Bestellnummer:</strong></p>
+                                            <p>" + ID + "</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <table class="table tableInvoiceDetails">
+                                            <thead>
+                                                <tr>
+                                                    <th scope='col'>Pos.</th>
+                                                    <th scope='col'>Artikel-Nr.</th>
+                                                    <th scope='col'>Bezeichnung</th>
+                                                    <th scope='col'>Einzelpreis</th>
+                                                    <th scope='col'>Menge</th>
+                                                    <th scope='col'>Gesamtpreis</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="invoiceTableBody">
+                                                <tr>
+                                                    <th scope=" row">1</th>
+                                                    <td>1234</td>
+                                                    <td>Der mit dem Wolf tanzt</td>
+                                                    <td>16 EUR</td>
+                                                    <td>1</td>
+                                                    <td>16 EUR</td>
+                                                </tr>" +
+                                                // for each order item get data
+                                            + "</tbody>
+                                        </table> 
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='modal-footer'>
+                        <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Schließen</button>                                                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>");
+
+    
+    
+
+} */
+
 
 
 // ************************************************************
 //          CREATE INVOICE PAGE
 // ************************************************************
 
-function createInvoice(invoiceForOrderNo) {
+/* function createInvoice(invoiceForOrderNo) {
 
     // add customer data to invoice
     var customerData = getCustomerData();
@@ -690,7 +758,7 @@ function createInvoice(invoiceForOrderNo) {
         var orderDeliverDate = orderData['orderDeliverDate'];
         var orderTotal = orderData['orderTotal'];
         var orderDetails = orderData['orderDetails']; */
-        var orderPosition = orderData['orderPosition'];
+/*        var orderPosition = orderData['orderPosition'];
 
         // get information for every order position by iterating through it and append it to table
         for (var j = 0; j < orderPosition.length; j++) {
@@ -703,7 +771,7 @@ function createInvoice(invoiceForOrderNo) {
             $("#invoiceTableBody").append("<tr><td>" + (j+1) + "</td><td>" + orderPositionArticleNo + "</td><td>" + orderPositionArticleName + "</td><td>" + orderPositionArticlePrice + " EUR</td><td>" + orderPositionProductQuantity + "</td><td class='totalPricePerPosition'>" + orderPositionArticleTotal + " EUR</td></tr>");
         }
     }
-}
+} */
 
 
 

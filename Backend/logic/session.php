@@ -1,7 +1,6 @@
 <?php
 //necessary for every session access
 
-// BUG !!!! now deactivated cause otherwise the session is not working
 session_start();
 
 require (dirname(__FILE__,2) . "..\config\dbaccess.php");

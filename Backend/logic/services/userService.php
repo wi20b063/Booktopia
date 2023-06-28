@@ -87,7 +87,7 @@ class UserService {
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
+        // $row = $result->fetch_assoc();
                 
         if ($result->num_rows > 0) {
             // User already exists
@@ -220,7 +220,7 @@ class UserService {
 
         // unset cookies
         if (isset($_COOKIE['rememberLogin'])) {
-            echo " // Unset cookie: " . $_COOKIE['rememberLogin'];
+            // echo " // Unset cookie: " . $_COOKIE['rememberLogin'];
             // unset($_COOKIE['username']);
             setcookie("rememberLogin", "", time() - 3600, "/"); // 86400 = 1 day / secure, http only
         }       
@@ -363,7 +363,7 @@ class UserService {
             $stmt->bind_param("s", $username);
             $stmt->execute();
             $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
+            // $row = $result->fetch_assoc();
             
             if ($result->num_rows > 0) {
 
@@ -374,7 +374,7 @@ class UserService {
                 $stmt->bind_param("ss", $username, $passwordToBeChecked);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $row = $result->fetch_assoc();
+                // $row = $result->fetch_assoc();
                 
                 if ($result->num_rows > 0) {
 
@@ -401,19 +401,21 @@ class UserService {
     //          SAVE EDITED USER PROFILE
     // ************************************************************
     
-    public function saveEditedUserData($usereditedUser) {
+    public function saveEditedUserData($editedUser) {
 
         // get data from array
-        $salutation = $usereditedUser['salutation'];
-        $firstName = $usereditedUser['firstName'];
-        $lastName = $usereditedUser['lastName'];
-        $address = $usereditedUser['address'];
-        $postcode = $usereditedUser['postcode'];
-        $location = $usereditedUser['location'];
-        $email = $usereditedUser['email'];
-        $username = $usereditedUser['username'];
-        $password = $usereditedUser['password'];
-        $creditCard = $usereditedUser['creditCard'];
+        $salutation = $editedUser['salutation'];
+        $firstName = $editedUser['firstName'];
+        $lastName = $editedUser['lastName'];
+        $address = $editedUser['address'];
+        $postcode = $editedUser['postcode'];
+        $location = $editedUser['location'];
+        $email = $editedUser['email'];
+        $username = $editedUser['username'];
+        // $password = $editedUser['password'];
+        $creditCard = $editedUser['creditCard'];
+
+        // echo " // saveEditedUserData in userService.php reached for user: " . $username . "<br>";
 
         // check if user already exists with prepared statement
         $sql = "SELECT * FROM user WHERE username = ?";
@@ -421,7 +423,7 @@ class UserService {
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
+        // $row = $result->fetch_assoc();
                 
         if ($result->num_rows > 0) {
             // User already exists            
@@ -434,6 +436,7 @@ class UserService {
             $result = $stmt->get_result();
             if ($result->affected_rows > 0) {
                 // user updated
+                // echo " // Nutzerdaten aktualisiert.";
                 header("Refresh:0; url=../profile.php");
             } else {
                 // error - user not updated
@@ -453,7 +456,7 @@ class UserService {
     // ************************************************************
     
     // get user data
-    public function getOrderData() {
+    /* public function getOrderData() {
 
         $orderData = array();
 
@@ -494,7 +497,7 @@ class UserService {
         
         return $orderData;
 
-    }
+    } */
 
        
     /* public function delete(User $user) {
