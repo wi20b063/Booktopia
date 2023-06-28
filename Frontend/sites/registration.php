@@ -24,7 +24,7 @@
 
                 <h1 class="headline">Registrierung</h1>
 
-                <div class="row col-md-6">
+                <div class="row col-md-9">
 
                     <form class="data-form" id="registrationForm" action="registration.php" method="post"
                         autocomplete="on">
@@ -93,13 +93,15 @@
                             <input type="password" name="passwordConfirmed" id="passwordConfirmedRegistration"
                                 minlength="8" class="form-control" required>
                         </div>
+                        <?php
+                        require_once ("components/paymentData.php");
+                        ?>
 
-                        <div class="mb-4">
+                     <!--    <div class="mb-4">
                             <label for="creditCard">Kreditkartennummer:</label><br>
                             <input type="int" name="creditCard" id="creditCardRegistration" placeholder="12345678"
                                 class="form-control">
-                        </div>
-
+                        </div> -->
                         <div class="mb-4 errors" id="errorRegistration"></div>
 
                         <div class="mb-5">

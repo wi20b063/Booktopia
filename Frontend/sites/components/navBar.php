@@ -15,7 +15,7 @@
                 <a class="nav-link active" aria-current="page" href="index.php">Home</a>
             </li>
             <li class="nav-item" id="navProducts">
-                <a class="nav-link" href="#">Produkte</a>
+                <a class="nav-link" href="products.php">Produkte</a>
             </li>
             <li class="nav-item" id="navAboutUs">
                 <a class="nav-link" href="#">Über uns</a>
@@ -40,28 +40,22 @@
 
         <ul class="nav navbar-nav navbar-right">
             <form class="d-flex" role="search" id="navSearch">
-                <input class=" form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <input class=" form-control me-2" type="text" id="searchInput" name="searchInput" placeholder="Produktsuche" aria-label="Search">
+                <div id="searchResults"></div>
             </form>
             <li class="nav-item" id="navShoppingCart">
-                <a class="nav-link" href="#">Warenkorb</a>
+                <a class="nav-link" href="shoppingCart.php"><img src="../res/img/cart.png" weight="30" height = "30"></a>
             </li>
-            <!-- <li class="nav-item" id="navProfile">
+            <li class="nav-item" id="navShoppingCart">
+                <span class="badge bg-danger" id="shopping-cart-badge">0</span>
+            </li>
+            <li class="nav-item" id="navProfile">
                 <a class="nav-link" href="#">Mein Konto</a>
-            </li> -->
-            <li class="nav-item dropdown" id="navMyAccountDropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">Mein Konto</a>
-                <ul class="dropdown-menu dropdown-menu-end" id="navbar-dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" id="navProfile" href=" ../sites/profile.php">Profil</a></li>
-                    <li><a class="dropdown-item" href="../sites/orderOverviewCustomer.php">Bestellungen</a></li>
-                    <!-- <li><a class="dropdown-item" href="../sites/invoiceOverviewCustomer.php">Rechnungen</a></li> -->
-                </ul>
             </li>
             <li class="nav-item" id="navLogin">
                 <a class="nav-link" href="../sites/login.php">Login</a>
             </li>
-            <li class="nav-item" id="navLogout">
+            <li class="nav-item" id="navLougout">
                 <a class="nav-link" href="#">Logout</a>
             </li>
         </ul>

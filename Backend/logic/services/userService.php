@@ -1,10 +1,10 @@
 <?php
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path .'/backend/logic/session.php');
+require_once ($path . '/backend/models/paymentType.php');
+require_once ($path . '/backend/models/user.php');
 
-//require(dirname(__FILE__, 3) . "/config/dbaccess.php");
-require (dirname(__FILE__, 2) . "\session.php");
-
-
-$salutation = $firstName = $lastName = $address = $postcode = $location = $creditCard = $email = $username = $password = "";
+$salutation = $firstName = $lastName = $address = $postcode = $location  = $email = $username = $password = $admin = $active= 0;
 
 
 // UserService Class implements CRUD operations
@@ -14,11 +14,21 @@ class UserService {
     // get data from MySQL database with SQL statements
     private $con;
     private $tbl_user;
+    private $userID;
+
+    private User $user;
 
     public function __construct($con, $tbl_user) {
         $this->con = $con;
         $this->tbl_user = $tbl_user;
+        if($tbl_user!=null){    // while registering new user
+            $this->userID=$_SESSION["userid"];
+        }
+        
     }
+
+    
+
 
     // find all users mit prepared statement
     /* public function findAll() {        
@@ -29,7 +39,7 @@ class UserService {
 
         $users = [];
         while ($row = $result->fetch_assoc()) {
-            $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
+            $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode$postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
             $users[] = $user;
         }
 
@@ -55,31 +65,32 @@ class UserService {
             return null; // Benutzer nicht gefunden
         }
 
-        $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
+        $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode$postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
         return $user;
     } */
 
-
-
-    // ************************************************************
-    //          SAVE / REGISTER USER
-    // ************************************************************
-    
     // create or update user mit prepared statement with array as input
     public function saveUser($user) {
         // get data from array
-        $salutation = $user['salutation'];
-        $firstName = $user['firstName'];
-        $lastName = $user['lastName'];
-        $address = $user['address'];
-        $postcode = $user['postcode'];
-        $location = $user['location'];
-        $email = $user['email'];
-        $username = $user['username'];
-        $password = $user['password'];
-        $creditCard = $user['creditCard'];
+        
+        $salutation = $user["salutation"];
+        $firstName = $user["firstName"];
+        $lastName = $user["lastName"];
+        $address = $user["address"];
+        $postcode = $user["postcode"];
+        $location = $user["location"];
+        $email = $user["email"];
+        $username = $user["username"];
+        $password = $user["password"];
+        $paymentMethodDetail=$user["paymentType"]["payMethodDetail"];
+        $paymentMethod=$user["paymentType"]["paymentMethodNum"];
+        $paymentUserId=0;
+
+        //$creditCard = $user['creditCard']; replaced w paymentItem
         $active = 1;
         $admin = 0;    
+
+        echo "username in saveUser in userService.php: " . $username;
 
         // check if user already exists with prepared statement
         $sql = "SELECT * FROM user WHERE username = ?";
@@ -87,8 +98,10 @@ class UserService {
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
-        // $row = $result->fetch_assoc();
-                
+        $row = $result->fetch_assoc();
+        
+        echo " username if user exists in userServie.php: " . $row['username'];
+        
         if ($result->num_rows > 0) {
             // User already exists
 
@@ -96,7 +109,7 @@ class UserService {
             
             
             // update user with prepared statement
-            /* $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, creditCard = ?, email = ?, username = ?, password = ? WHERE username = ?";
+            /* $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode$postcode = ?, location = ?, creditCard = ?, email = ?, username = ?, password = ? WHERE username = ?";
             $stmt = $this->con->prepare($sqlUpd);
             $stmt->bind_param("sssssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password, $username);
             $stmt->execute();
@@ -108,34 +121,37 @@ class UserService {
                 // error - user not updated
             } */
         } else {
-            // echo " User does not exist";
+            echo " User does not exist";
             // add user with prepared statement         
-            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, creditCard, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->con->prepare($sqlIns);
-            $stmt->bind_param("ssssssssssii", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password, $active, $admin);
+            $stmt->bind_param("sssssssssii", $salutation, $firstName, $lastName, $address, $postcode, $location, $email, $username, $password, $active, $admin);
             $stmt->execute();
             $result = mysqli_stmt_affected_rows($stmt);
             
             if ($result == 1) {
                 // user created
-                // echo " User created";
-                header("Refresh:0; url=../index.php");
-                // echo "<script>alert('Bitte loggen Sie sich ein, um fortzufahren.');</script>";
+                $last_id = mysqli_stmt_insert_id($stmt) ;
+                $result = $this->addNewPaymentMethod($last_id,$paymentMethod, $paymentMethodDetail );
+                if($result >0){
+                    echo " User created";
+                    header("Refresh:0; url=../index.php");
+                    echo "<script>alert('Bitte loggen Sie sich ein, um fortzufahren.');</script>";
+                }
+                
             } else {
                 // error - user not created
-                echo " Fehler: Nutzer wurde nicht erstellt.";
+                echo " ERROR - User not created";
             }
         }
-    }
-    
-    
-
-    // ************************************************************
-    //          LOGIN USER
-    // ************************************************************
+    } 
 
     // login user with prepared statement (username and password) and server validation
-    public function loginUser($username, $password, $rememberMe) {      
+    public function loginUser($username, $password) {
+
+        echo "<script>console.log('loginUser in userServie.php reached');</script>";
+        echo "username: " . $username;
+        echo "password: " . $password;        
         
         // check if user exists with prepared statement
         $sql = "SELECT * FROM user WHERE username = ?";
@@ -145,9 +161,15 @@ class UserService {
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         
+        echo " username if user exists in userServie.php: " . $row['username'];
+        echo " password if user exists in userServie.php: " . $row['password'];
+
+        
         if ($result->num_rows > 0) {
 
             // User exists            
+            echo " User exists";
+            
             // check if password is correct with prepared statement (password is sha256 hashed)
             $sql = "SELECT * FROM user WHERE username = ? AND password = ?";
             $stmt = $this->con->prepare($sql);
@@ -156,8 +178,22 @@ class UserService {
             $result = $stmt->get_result();
             $row = $result->fetch_assoc();
             
+            echo " data from database if entered data matches " . $row['username'] . " " . $row['password'];
+            
             if ($result->num_rows > 0) {
 
+                // entered data matches data in database
+                echo " passed check process executed in userServie.php reached ";
+                echo " result username: " . $row['username'];
+                echo " result password: " . $row['password'];
+
+                // set cookies
+                $cookie_name = "username";
+                $cookie_value = $username;
+                setcookie($cookie_name, $cookie_value, time() + (86400 * 30)); // 86400 = 1 day / secure, http only
+                
+
+                
                 // set session variables
                 $_SESSION['username'] = $username;
                 // get userid, admin and active from query saved in $result in userService.php
@@ -165,27 +201,11 @@ class UserService {
                 $_SESSION['admin'] = $row['admin'];
                 $_SESSION['active'] = $row['active'];
                           
-                // if rememberMe checked, set cookie to expire after 30 days
-                if ($rememberMe == "true") {
-                    
-                    // echo " rememberMe checked: " . $rememberMe;
-                    //setcookie("rememberLogin", $username, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
-                    
-                    // set secure cookie with salt and encode with base64
-                    $salt = "!1salt#@"; // salt for secure cookie
-                    $encodedCookieValue = base64_encode($salt . $username);
-                    // setcookie(key, value, expire, path, domain, secure, httponly);
-                    setcookie("rememberLogin", $encodedCookieValue, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
-                    
-                // if rememberMe not checked, set cookie to expire after 30 minutes and when closing browser
-                } else {
-                    // echo " rememberMe NOT checked: " . $rememberMe;
-                    // setcookie("username", $username, time() - (86400)); // 86400 = 1 day / secure, http only
-                    // setcookie("password", $password, time() - (86400)); // 86400 = 1 day / secure, http only
-                    // session_set_cookie_params(0);
-                }
-            
-                // echo " // the following was set cookie ins userService.php: " . $_COOKIE["username"];
+                echo " session variables:";
+                echo " session username: " . $_SESSION['username'];
+                echo " sesion userid: " . $_SESSION['userid'];
+                echo " session admin: " . $_SESSION['admin'];
+                echo " sessioni active: " . $_SESSION['active'];              
                 
                 //header("Refresh:0; url=../../../Booktopia/Frontend/sites/index.php");
                 return true;
@@ -193,22 +213,15 @@ class UserService {
             } else {
                 // password incorrect
                 // error - password incorrect
-                return "Passwort ist nich korrekt.";
+                return false;
             }
         } else {
             // error - user not found
-            return "Username wurde nicht gefunden.";
+            return false;
         }
     }
 
-    
-
-    // ************************************************************
-    //          LOGOUT USER
-    // ************************************************************
-
-    
-    public function logoutUser() {
+    /* public function logoutUser() {
 
         echo " logoutUser in userServie.php reached";
 
@@ -216,77 +229,15 @@ class UserService {
         session_unset();
 
         // destroy the session
-        session_destroy();        
+        session_destroy();
 
-        // unset cookies
-        if (isset($_COOKIE['rememberLogin'])) {
-            // echo " // Unset cookie: " . $_COOKIE['rememberLogin'];
-            // unset($_COOKIE['username']);
-            setcookie("rememberLogin", "", time() - 3600, "/"); // 86400 = 1 day / secure, http only
-        }       
-
-        return true;
-    }
+    } */
 
 
-    // ************************************************************
-    //          GET USER DATA
-    // ************************************************************
-    
-    // get user data
-    public function getUserData() {
-
-        $userData = array();
-
-        if (isset($_SESSION["username"])) {
-
-            $username = $_SESSION["username"];
-
-            // check if user exists with prepared statement
-            $sql = "SELECT * FROM user WHERE username = ?";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            
-            if ($result->num_rows > 0) {
-
-                $userData["salutation"] = $row['salutation'];
-                $userData["firstName"] = $row['firstName'];
-                $userData["lastName"] = $row['lastName'];
-                $userData["address"] = $row['address'];
-                $userData["postcode"] = $row['postcode'];
-                $userData["location"] = $row['location'];
-                $userData["email"] = $row['email'];
-                $userData["username"] = $row['username'];
-                $userData["password"] = $row['password'];
-                $userData["creditCard"] = $row['creditCard'];
-                $userData["active"] = $row['active'];
-                $userData["admin"] = $row['admin'];
-
-                // return $userData;
-            }
-            
-            // return $userData;
-            
-        }
-        
-        return $userData;
-
-    }
-
-
-
-
-    // ************************************************************
-    //          GET SESSION VARIABLES
-    // ************************************************************
-    
     // get session variables
     public function getSession() {
 
-        // echo " // getSession in userServie.php reached";
+        echo " getSession in userServie.php reached";
 
         $userSession = array();
 
@@ -297,207 +248,19 @@ class UserService {
             $userSession['sessionUserid'] = $_SESSION['userid'];
             $userSession['sessionAdmin'] = $_SESSION['admin'];
             $userSession['sessionActive'] = $_SESSION['active'];
-            // $userSession['sessionLoggedIn'] = $_SESSION['loggedIn'];
 
             // echo username from userSession array
-            // echo " // username from userSession array in userService.php: " . $userSession['sessionUsername'];
+            echo " username from userSession array in userService.php: " . $userSession['sessionUsername'];
             
             return $userSession;
-
-        } elseif (isset($_COOKIE["rememberLogin"])) {
             
-            // echo " // COOKIE SET: " . $_COOKIE["username"];
-
-            $encodedCookieRememberLogin = $_COOKIE["rememberLogin"];
-
-            $decodedCookieRememberLogin = base64_decode($encodedCookieRememberLogin);
-            // $decodedSalt = substr($decodedCookieRememberLogin, 0, 8);
-            $decodedUsernameFromCookie = substr($decodedCookieRememberLogin, 8);
-
-            // echo " // decodedSalt: " . $decodedSalt;
-            // echo " // decodedCookieRememberLogin: " . $decodedUsernameFromCookie;
-
-            // check if user exists with prepared statement
-            $sql = "SELECT * FROM user WHERE username = ?";
-            // $sql = "SELECT * FROM user WHERE username = ? LIMIT 1";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bind_param("s", $decodedUsernameFromCookie);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            
-            if ($result->num_rows > 0) {
-
-                // set session variables
-                // get username, userid, admin and active from query saved in $result in userService.php
-                $userSession['sessionUsername'] = $row['username'];
-                $userSession['sessionUserid'] = $row['userid'];
-                $userSession['sessionAdmin'] = $row['admin'];
-                $userSession['sessionActive'] = $row['active'];
-            
-                return $userSession;
-            }            
             
         } else {
-            
-            // return empty array            
+            echo " GUEST: session variables not set";
             return $userSession;
-                        
         }
     }
 
-
-    // ************************************************************
-    //          CHECK PASSWORD
-    // ************************************************************
-
-    // check password
-    public function checkPassword($passwordToBeChecked) {
-
-        if (isset($_SESSION["username"])) {
-            $username = $_SESSION["username"];
-
-            // check if user exists with prepared statement
-            $sql = "SELECT * FROM user WHERE username = ?";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            // $row = $result->fetch_assoc();
-            
-            if ($result->num_rows > 0) {
-
-                // User exists            
-                // check if password is correct with prepared statement (password is sha256 hashed)
-                $sql = "SELECT * FROM user WHERE username = ? AND password = ?";
-                $stmt = $this->con->prepare($sql);
-                $stmt->bind_param("ss", $username, $passwordToBeChecked);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                // $row = $result->fetch_assoc();
-                
-                if ($result->num_rows > 0) {
-
-                    // password correct
-                    return true;
-                    
-                } else {
-                    // password incorrect
-                    // error - password incorrect
-                    return "Passwort ist nich korrekt.";
-                }
-            } else {
-                // error - user not found
-                return "Username wurde nicht gefunden. Bitte einloggen.";
-            }
-            
-            
-        }
-        
-    }
-
-
-    // ************************************************************
-    //          SAVE EDITED USER PROFILE
-    // ************************************************************
-    
-    public function saveEditedUserData($editedUser) {
-
-        // get data from array
-        $salutation = $editedUser['salutation'];
-        $firstName = $editedUser['firstName'];
-        $lastName = $editedUser['lastName'];
-        $address = $editedUser['address'];
-        $postcode = $editedUser['postcode'];
-        $location = $editedUser['location'];
-        $email = $editedUser['email'];
-        $username = $editedUser['username'];
-        // $password = $editedUser['password'];
-        $creditCard = $editedUser['creditCard'];
-
-        // echo " // saveEditedUserData in userService.php reached for user: " . $username . "<br>";
-
-        // check if user already exists with prepared statement
-        $sql = "SELECT * FROM user WHERE username = ?";
-        $stmt = $this->con->prepare($sql);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        // $row = $result->fetch_assoc();
-                
-        if ($result->num_rows > 0) {
-            // User already exists            
-            
-            // update user with prepared statement
-            $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, creditCard = ?, email = ? WHERE username = ?";
-            $stmt = $this->con->prepare($sqlUpd);
-            $stmt->bind_param("sssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->affected_rows > 0) {
-                // user updated
-                // echo " // Nutzerdaten aktualisiert.";
-                header("Refresh:0; url=../profile.php");
-            } else {
-                // error - user not updated
-                echo " // Fehler: Nutzerdaten konnten nicht aktualisiert werden.";
-            }
-            
-        } else {
-            echo " // Nutzer existiert nicht.";
-        }
-
-        
-    }
-
-
-    // ************************************************************
-    //          GET ORDER DATA
-    // ************************************************************
-    
-    // get user data
-    /* public function getOrderData() {
-
-        $orderData = array();
-
-        if (isset($_SESSION["username"])) {
-
-            $username = $_SESSION["username"];
-
-            // check if user exists with prepared statement
-            $sql = "SELECT * FROM user WHERE username = ?";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
-            
-            if ($result->num_rows > 0) {
-
-                // user exits: get all orders from this user with prepared statement and save in array
-                
-                $sql = "SELECT * FROM orders WHERE userid = ?";
-                $stmt = $this->con->prepare($sql);
-                $stmt->bind_param("i", $row['userid']);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $row = $result->fetch_assoc();
-                
-                // save array with orders in $orderData
-                $orderData = $result->fetch_all(MYSQLI_ASSOC);
-                
-                
-
-                // return $orderData;
-            }
-            
-            // return $orderData;
-            
-        }
-        
-        return $orderData;
-
-    } */
 
        
     /* public function delete(User $user) {
@@ -510,6 +273,57 @@ class UserService {
     } */
 
     // Close connection
+
+
+    //adds the payment option of a user to DB 
+    public function addNewPaymentMethod($userId,  $paymentMethodId, $paymentMethodDetails){
+        // create payment method, find out paymentItemNr (if user has one already)and then update database
+        $userPaymentItemId=$this->getNewPaymentMethodID($this->userID);
+        $intPaymentMethodId=(int)$paymentMethodId;
+        
+        $sqlIns = "INSERT INTO paymentitems (userId, userPayMethodId, paymentMethod, payMethodDetail) VALUES (?,?,?,?)";
+            $stmt = $this->con->prepare($sqlIns);
+            $stmt->bind_param("iiis", $userId, $userPaymentItemId, $intPaymentMethodId, $paymentMethodDetails);
+            $stmt->execute();
+            $result = mysqli_stmt_affected_rows($stmt);
+            if ($result == 1) {
+                // paymentMethod added
+                echo " Paymentmethod added";
+            } else {
+                // error - paymentMethod not created
+                echo " ERROR - Payment Method not created";
+            }
+            return($result);
+    }
+
+
+    //returns the next  paymment option number of user
+    public function getNewPaymentMethodID($userID){
+        $index=0;
+        $sql = "Select Max(userPayMethodId) from paymentItems WHERE userId = ?";
+        $query = $this->con->prepare($sql);
+        $query->bind_param("s", $this->userID);
+        $query->execute();
+        $query->bind_result($index);
+        $query->fetch();
+        return $index+1;
+    }
+//returns all payment options of  user
+    public function getUserPayMethods($userID){
+        $sql = "Select * from paymentItems WHERE userId = ?";
+        $query = $this->con->prepare($sql);
+        $query->bind_param("s", $this->userID);
+        $query->execute();
+        $result= $query->get_result();
+        while($resSet = mysqli_fetch_assoc($result)){
+            $userPayMethods[$i++]= new PaymenMetType($resSet['userId'], $resSet['userPayMethodId'],$resSet['paymentMethod'],$resSet['payMethodDetails']);
+        }
+        return $userPayMethods;
+    }
+
+
+    
+
     public function closeConnection() {
         $this->con->close();
     }

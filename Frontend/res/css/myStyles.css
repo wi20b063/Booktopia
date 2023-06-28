@@ -89,16 +89,56 @@ footer {
     padding: 20px;
 }
 
-/* END styling of footer */
 
-/* START styling of order status */
+/* START styling of buttons */
 
-.orderStatusGeliefert {
-    background-color: lightgreen;
+
+.btn-grey {
+    color: black;
+    background-color: #bfcad1;
 }
 
-.orderStatusStorniert {
-    background-color: lightpink;
+.btn-grey:hover {
+    background-color: #d2dde4;
 }
 
+.btn-yellow {
+    color: #143e58;
+    background-color: #ffcc00;
+}
 
+.btn-yellow:hover {
+    color: #143e58;
+    background-color: #ffd940;
+}
+
+.btn-red {
+    color: white;
+    background-color: #D42A04;
+}
+
+.btn-red:hover {
+    color: white;
+    background-color: #a52104;
+}
+
+.btn-blue {
+    color: white;
+    background-color: #1a5276;
+}
+
+.btn-blue:hover {
+    color: white;
+    background-color: #143e58;
+}
+
+/* END styling of buttons */
+.container{
+    row-gap: 7px;
+    column-gap: 5px;
+}
+
+#usrTable tr.header, #usrTable tr:hover {
+    /* Add a grey background color to the table header and on hover */
+    background-color: #f5f5f5;
+  }

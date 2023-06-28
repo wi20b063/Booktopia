@@ -1,6 +1,7 @@
 <?php
 
-include "session.php";
+$path = $_SERVER['DOCUMENT_ROOT'];
+require_once ($path .'/backend/logic/session.php');
 
 // remove all session variables
 session_unset();
@@ -8,11 +9,7 @@ session_unset();
 // destroy the session
 session_destroy();
 
-// unset cookies
-setcookie("username", "", time() - 3600); // 86400 = 1 day / secure, http only
-
-
 //gehe zu Startseite
-header('Refresh: 0; URL = ../../Frontend/sites/index.php');
+header('Refresh: 0; URL = ../index.php');
 
 ?>

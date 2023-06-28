@@ -1,41 +1,47 @@
 <?php
+ $path = $_SERVER['DOCUMENT_ROOT'];
+ require_once ($path. '/Backend/models/paymentType.php');
 
 // User Model --> already adapted according to the database
 
 class User {
 
-    public $userid;
-    public $salutation;
-    public $firstName;
-    public $lastName;
-    public $address;
-    public $postcode;
-    public $location;
-    public $creditCard;
-    public $email;
-    public $username;
-    public $password; 
+    private $userId;
+    private $salutation;
+    private $firstName;
+    private $lastName;
+    private $address;
+    private $postcode;
+    private $location;
+    private $payMethods=[];
+    private $email;
+    private $username;
+    private $password; 
+    private $active;
+    private $admin;
 
 
-    public function __construct(int $userid, string $salutation, string $firstName,
+    public function __construct(int $userId, string $salutation, string $firstName,
                                 string $lastName, string $address, string $postcode,
-                                string $location, string $creditCard, string $email,
-                                string $username, string $password) { 
-        $this->userid         = $userid;
+                                string $location, array $payMethods, string $email,
+                                string $username, string $password, int $active, int $admin) { 
+        $this->userId         = $userId;
         $this->salutation     = $salutation;
         $this->firstName      = $firstName;
         $this->lastName       = $lastName;
         $this->address        = $address;
-        $this->postcode       = $postcode;
+        $this->postcode     = $postcode;
         $this->location       = $location;
-        $this->creditCard     = $creditCard;
+        $this->payMethods   = $payMethods;
         $this->email          = $email;
         $this->username       = $username;
         $this->password       = $password;
+        $this->active         = $active;
+        $this->admin          = $admin;
     }
 
-    public function getUserid() {
-        return $this->userid;
+    public function getuserId() {
+        return $this->userId;
     }
     
     public function getSalutation() {
@@ -54,7 +60,7 @@ class User {
         return $this->address;
     }
 
-    public function getPostcode() {
+    public function getpostcode() {
         return $this->postcode;
     }
 
@@ -62,8 +68,8 @@ class User {
         return $this->location;
     }
 
-    public function getCreditCard() {
-        return $this->creditCard;
+    public function getpaymentMethods() {
+        return $this->payMethods;
     }
 
     public function getEmail() {
@@ -76,6 +82,13 @@ class User {
 
     public function getPassword() {
         return $this->password;
+    }
+
+    public function getActive() {
+        return $this->active;
+    }
+    public function getAdmin(){
+        return $this->admin;
     }
 
 }
