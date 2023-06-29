@@ -1,6 +1,3 @@
-<?php include (dirname(__FILE__, 3) . "\Backend\logic\session.php");?>
-
-
 <!DOCTYPE html>
 
 <html lang="EN">
@@ -87,11 +84,11 @@
                                 class="form-control" disabled>
                         </div>
 
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <label for="creditCard">Kreditkartennummer:</label><br>
                             <input type="password" name="creditCard" id="creditCardProfile" placeholder="12345678"
                                 class="form-control editableProfile" disabled>
-                        </div>
+                        </div> -->
 
                         <div class="mb-4 errors" id="errorProfile"></div>
 

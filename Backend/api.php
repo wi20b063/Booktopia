@@ -102,10 +102,11 @@ class Api {
             $this->success(200, "", $userData);
             
         // get order data
-        /* } elseif (isset($_GET["getOrderData"])) {
-
+        } elseif (isset($_GET["getOrderData"])) {
+            // echo "getOrderData in api.php reached";
             $orderData = $this->userService->getOrderData();
-            $this->success(200, "", $orderData); */
+            // echo "orderData in api.php: " . $orderData . "<br>";
+            $this->success(200, "", $orderData);
         
         // logout user
         } elseif (isset($_GET['logoutUser'])) {

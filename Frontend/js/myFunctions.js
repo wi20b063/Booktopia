@@ -21,6 +21,15 @@ $(document).ready(function () {
 
     // load user data in profile.php
     loadUserData();
+
+    // load order overview for customer in orderOverviewCustomer.php
+    loadOrderOverviewCustomer();
+
+    // when clicked button from class showInvoiceCustomer fill page invoice.php
+    /* $(".showInvoiceCustomer").on("click", function() {
+        var invoiceForOrderNo = $(this).attr("id");
+        createInvoice(invoiceForOrderNo);
+    }); */
     
     $("#btnEditProfile").on("click", function() {
         // make profile form fields editable
@@ -39,15 +48,6 @@ $(document).ready(function () {
             saveEditedUserData();    
         });
     
-    });
-
-    // load order overview for customer in orderOverviewCustomer.php
-    // loadOrderOverviewCustomer();
-
-    // when clicked button from class showInvoiceCustomer fill page invoice.php
-    $(".showInvoiceCustomer").on("click", function() {
-        var invoiceForOrderNo = $(this).attr("id");
-        createInvoice(invoiceForOrderNo);
     });
 
     
@@ -69,7 +69,7 @@ function loadNavBar() {
     var sessionAdmin = userSession['sessionAdmin'];
     var sessionActive = userSession['sessionActive'];
 
-    console.log("user description:")
+    console.log("session variables:")
     console.log("username: " + sessionUsername);
     console.log("userid: " + sessionUserid);
     console.log("admin: " + sessionAdmin);
@@ -129,7 +129,7 @@ function registerUser() {
     var username = $("#usernameRegistration").val();
     var password = $("#passwordRegistration").val();
     var passwordConfirmed = $("#passwordConfirmedRegistration").val();
-    var creditCard = $("#creditCardRegistration").val();
+    // var creditCard = $("#creditCardRegistration").val();
     
     // console.log("registerUser() called");
     // console.log("password: " + password);
@@ -167,7 +167,7 @@ function registerUser() {
         username: username,
         password: password,
         passwordConfirmed: passwordConfirmed,
-        creditCard: creditCard
+        // creditCard: creditCard
     }
 
     console.log(user);
@@ -364,7 +364,7 @@ function loadUserData() {
     var email = profileUserData['email'];
     var username = profileUserData['username'];
     var password = profileUserData['password'];
-    var creditCard = profileUserData['creditCard'];
+    // var creditCard = profileUserData['creditCard'];
     var active = profileUserData['active'];
     var admin = profileUserData['admin'];
 
@@ -380,7 +380,7 @@ function loadUserData() {
     $("#emailProfile").val(email);
     $("#usernameProfile").val(username);
     $("#passwordProfile").val(password);
-    $("#creditCardProfile").val(creditCard);
+    // $("#creditCardProfile").val(creditCard);
     // $("#activeProfile").val(active);
     // $("#adminProfile").val(admin);
 
@@ -449,7 +449,7 @@ function saveEditedUserData() {
         var email = $("#emailProfile").val();
         var username = $("#usernameProfile").val();
         var password = $("#passwordProfile").val();
-        var creditCard = $("#creditCardProfile").val();
+        // var creditCard = $("#creditCardProfile").val();
         // var active = $("#activeProfile").val();
         // var admin = $("#adminProfile").val();
 
@@ -475,7 +475,7 @@ function saveEditedUserData() {
             email: email,
             username: username,
             password: password,
-            creditCard: creditCard,
+            // creditCard: creditCard,
             // active: active,
             // admin: admin
         }
@@ -551,30 +551,33 @@ function checkPasswordForSavingProfile(passwordForSavingProfile) {
 
 function loadOrderOverviewCustomer() {
 
+    // console.log("loadOrderOverviewCustomer() reached in myFunctions.js");
+
     // get array with order data
     var orderData = getOrderData();
 
     // get every items from array by iterating through it and append it to table
     for (var i = 0; i < orderData.length; i++) {
-        var orderNumber = orderData['orderNumber'];
-        var orderDate = orderData['orderDate'];
-        var orderStatus = orderData['orderStatus'];
-        var orderDeliverDate = orderData['orderDeliverDate'];
-        var orderTotal = orderData['orderTotal'];
-        var orderDetails = orderData['orderDetails'];
+        var orderId = orderData[i]['orderId'];
+        var orderDate = orderData[i]['orderDate'];
+        orderDate = orderDate.split(" ")[0];
+        var deliveryDate = orderData[i]['deliveryDate'];
+        deliveryDate = deliveryDate.split(" ")[0];
+        var deliveryAddress = orderData[i]['deliveryAddress'];
+        var deliveryStatus = orderData[i]['deliveryStatus'];
+        var quantity = orderData[i]['quantity'];
+        var totalPrice = orderData[i]['totalPrice'] + " EUR";
 
-        $("#orderOverviewCustomerTable").append("<tr><td>" + orderNumber + "</td><td>" + orderDate + "</td><td class='orderStatus'"
-         + orderStatus + ">" + orderStatus + "</td><td>" + orderDeliverDate + "</td><td>" + orderTotal + "</td><td>" 
-         + orderDetails + "</td><td><button type='button' id='invoiceOrderNo" + orderNumber + "' class='btn btn-primary showInvoiceCustomer'>Rechnung drucken</button></td></tr>");
+        $("#orderOverviewCustomerTableBody").append("<tr><td>" + orderId + "</td><td>" + orderDate + "</td><td>" + deliveryDate + "</td><td>" + deliveryAddress + "</td><td class='deliveryStatus" + deliveryStatus + "'>" + deliveryStatus + "</td><td>" + quantity + "</td><td>" + totalPrice + "</td><td><button type='button' id='orderDetails" + orderId + "' class='btn btn-primary showOrderDetails'>Details</button></td><td><button type='button' id='invoiceByOrderId" + orderId + "' class='btn btn-primary showInvoiceCustomer'>Rechnung drucken</button></td></tr>");
     }
 }
 
 
 // ************************************************************
-//          GET ALL ORDER DATA
+//          GET ALL ORDER DATA FOR SPECIFIC CUSTOMER
 // ************************************************************
 
-/* function getOrderData() {
+function getOrderData() {
 
     var orderData = [];
 
@@ -586,35 +589,35 @@ function loadOrderOverviewCustomer() {
         async: false,
         success: function (response) {
 
-            console.log("Response from api.php in getUserData():");
+            console.log("Response from api.php in getOrderData():");
             console.log(response);
-            userData = response;
+            orderData = response;
             
         },
 
-        error: function () {
+        error: function (e) {
             // Error handling
-            console.log("Error in error function of getUserData()");
+            console.log("Error in error function of getOrderData()");
         }
     });
 
     return orderData;    
 
-} */
+}
 
 // ************************************************************
-//          GET ORDER DATA BY ORDER NO
+//          GET ORDER DATA BY ORDER ID
 // ************************************************************
 
-/* function getOrderData(orderNo) {
+/* function getOrderData(orderId) {
 
     var orderData = [];
 
     $.ajax({
         type: "GET",
-        url: "../../Backend/api.php" + "?getOrderDataByOrderNo",
+        url: "../../Backend/api.php" + "?getOrderDataByOrderId",
         data: {
-            orderNo: orderNo
+            orderId: orderId
         },
         dataType: "json",
         cache: false,
@@ -752,11 +755,11 @@ function loadOrderOverviewCustomer() {
 
     // get every items from array by iterating through it and append it to table
     for (var i = 0; i < orderData.length; i++) {
-/*         var orderNumber = orderData['orderNumber'];
+/*         var orderId = orderData['orderId'];
         var orderDate = orderData['orderDate'];
-        var orderStatus = orderData['orderStatus'];
-        var orderDeliverDate = orderData['orderDeliverDate'];
-        var orderTotal = orderData['orderTotal'];
+        var deliveryStatus = orderData['deliveryStatus'];
+        var deliveryAddress = orderData['deliveryAddress'];
+        var totalPrice = orderData['totalPrice'];
         var orderDetails = orderData['orderDetails']; */
 /*        var orderPosition = orderData['orderPosition'];
 

@@ -77,7 +77,7 @@ class UserService {
         $email = $user['email'];
         $username = $user['username'];
         $password = $user['password'];
-        $creditCard = $user['creditCard'];
+        // $creditCard = $user['creditCard'];
         $active = 1;
         $admin = 0;    
 
@@ -110,9 +110,9 @@ class UserService {
         } else {
             // echo " User does not exist";
             // add user with prepared statement         
-            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, creditCard, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->con->prepare($sqlIns);
-            $stmt->bind_param("ssssssssssii", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password, $active, $admin);
+            $stmt->bind_param("sssssssssii", $salutation, $firstName, $lastName, $address, $postcode, $location, $email, $username, $password, $active, $admin);
             $stmt->execute();
             $result = mysqli_stmt_affected_rows($stmt);
             
@@ -261,7 +261,7 @@ class UserService {
                 $userData["email"] = $row['email'];
                 $userData["username"] = $row['username'];
                 $userData["password"] = $row['password'];
-                $userData["creditCard"] = $row['creditCard'];
+                // $userData["creditCard"] = $row['creditCard'];
                 $userData["active"] = $row['active'];
                 $userData["admin"] = $row['admin'];
 
@@ -413,7 +413,7 @@ class UserService {
         $email = $editedUser['email'];
         $username = $editedUser['username'];
         // $password = $editedUser['password'];
-        $creditCard = $editedUser['creditCard'];
+        // $creditCard = $editedUser['creditCard'];
 
         // echo " // saveEditedUserData in userService.php reached for user: " . $username . "<br>";
 
@@ -429,9 +429,9 @@ class UserService {
             // User already exists            
             
             // update user with prepared statement
-            $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, creditCard = ?, email = ? WHERE username = ?";
+            $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, email = ? WHERE username = ?";
             $stmt = $this->con->prepare($sqlUpd);
-            $stmt->bind_param("sssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username);
+            $stmt->bind_param("ssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $email, $username);
             $stmt->execute();
             $result = $stmt->get_result();
             if ($result->affected_rows > 0) {
@@ -456,11 +456,14 @@ class UserService {
     // ************************************************************
     
     // get user data
-    /* public function getOrderData() {
+    public function getOrderData() {
+
+        // echo " // getOrderData in userServie.php reached";
 
         $orderData = array();
 
         if (isset($_SESSION["username"])) {
+            // active session --> user is logged in
 
             $username = $_SESSION["username"];
 
@@ -475,17 +478,22 @@ class UserService {
             if ($result->num_rows > 0) {
 
                 // user exits: get all orders from this user with prepared statement and save in array
-                
                 $sql = "SELECT * FROM orders WHERE userid = ?";
                 $stmt = $this->con->prepare($sql);
                 $stmt->bind_param("i", $row['userid']);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $row = $result->fetch_assoc();
+                // $row = $result->fetch_assoc();
                 
                 // save array with orders in $orderData
                 $orderData = $result->fetch_all(MYSQLI_ASSOC);
+
+                // $orderData['orderId'] = $row['orderId'];
+                // $orderData['orderDate'] = $row['orderDate'];
                 
+                // echo " // orderData in userService.php: " . $orderData;
+                // echo " // orderId in getOrderData in userService.php row 0: " . $orderData[0]['orderId'];
+                // echo " // orderDate in getOrderData in userService.php: " . $orderData['orderDate'];
                 
 
                 // return $orderData;
@@ -497,7 +505,7 @@ class UserService {
         
         return $orderData;
 
-    } */
+    }
 
        
     /* public function delete(User $user) {
