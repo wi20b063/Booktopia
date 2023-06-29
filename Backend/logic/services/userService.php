@@ -1,8 +1,4 @@
-<?php
-
-//require(dirname(__FILE__, 3) . "/config/dbaccess.php");
-require (dirname(__FILE__, 2) . "\session.php");
-
+<?php 
 
 $salutation = $firstName = $lastName = $address = $postcode = $location = $creditCard = $email = $username = $password = "";
 
@@ -20,52 +16,12 @@ class UserService {
         $this->tbl_user = $tbl_user;
     }
 
-    // find all users mit prepared statement
-    /* public function findAll() {        
-        $sql = "SELECT * FROM " . $this->tbl_user;
-        $stmt = $this->con->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $users = [];
-        while ($row = $result->fetch_assoc()) {
-            $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
-            $users[] = $user;
-        }
-
-        $stmt->close();
-
-        return $users;
-    } */
-
-
-    // find user by id mit prepared statement
-    /* public function findByID(int $id) {        
-        $sql = "SELECT * FROM " . $this->tbl_user . " WHERE userid = ?";
-        $stmt = $this->con->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $row = $result->fetch_assoc();
-        
-        $stmt -> close();
-
-        if (!$row) {
-            return null; // Benutzer nicht gefunden
-        }
-
-        $user = new User($row['userid'], $row['salutation'], $row['firstName'], $row['lastName'], $row['address'], $row['postcode'], $row['location'], $row['creditCard'], $row['email'], $row['username'], $row['password']);
-        return $user;
-    } */
-
-
 
     // ************************************************************
     //          SAVE / REGISTER USER
     // ************************************************************
     
-    // create or update user mit prepared statement with array as input
+    // create user with prepared statement with array as input
     public function saveUser($user) {
         // get data from array
         $salutation = $user['salutation'];
@@ -91,26 +47,11 @@ class UserService {
                 
         if ($result->num_rows > 0) {
             // User already exists
-
             echo " User exists";
             
-            
-            // update user with prepared statement
-            /* $sqlUpd = "UPDATE user SET salutation = ?, firstName = ?, lastName = ?, address = ?, postcode = ?, location = ?, creditCard = ?, email = ?, username = ?, password = ? WHERE username = ?";
-            $stmt = $this->con->prepare($sqlUpd);
-            $stmt->bind_param("sssssssssss", $salutation, $firstName, $lastName, $address, $postcode, $location, $creditCard, $email, $username, $password, $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->affected_rows > 0) {
-                // user updated
-                header("Refresh:0; url=../index.php");
-            } else {
-                // error - user not updated
-            } */
         } else {
-            // echo " User does not exist";
             // add user with prepared statement         
-            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sqlIns = "INSERT INTO user (salutation, firstName, lastName, address, postcode, location, email, username, password, active, admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->con->prepare($sqlIns);
             $stmt->bind_param("sssssssssii", $salutation, $firstName, $lastName, $address, $postcode, $location, $email, $username, $password, $active, $admin);
             $stmt->execute();
@@ -118,9 +59,7 @@ class UserService {
             
             if ($result == 1) {
                 // user created
-                // echo " User created";
                 header("Refresh:0; url=../index.php");
-                // echo "<script>alert('Bitte loggen Sie sich ein, um fortzufahren.');</script>";
             } else {
                 // error - user not created
                 echo " Fehler: Nutzer wurde nicht erstellt.";
@@ -146,8 +85,8 @@ class UserService {
         $row = $result->fetch_assoc();
         
         if ($result->num_rows > 0) {
-
-            // User exists            
+            // User exists          
+              
             // check if password is correct with prepared statement (password is sha256 hashed)
             $sql = "SELECT * FROM user WHERE username = ? AND password = ?";
             $stmt = $this->con->prepare($sql);
@@ -156,8 +95,9 @@ class UserService {
             $result = $stmt->get_result();
             $row = $result->fetch_assoc();
             
-            if ($result->num_rows > 0) {
-
+            if ($result->num_rows > 0) {                
+                // password correct
+                
                 // set session variables
                 $_SESSION['username'] = $username;
                 // get userid, admin and active from query saved in $result in userService.php
@@ -168,30 +108,21 @@ class UserService {
                 // if rememberMe checked, set cookie to expire after 30 days
                 if ($rememberMe == "true") {
                     
-                    // echo " rememberMe checked: " . $rememberMe;
-                    //setcookie("rememberLogin", $username, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
-                    
                     // set secure cookie with salt and encode with base64
                     $salt = "!1salt#@"; // salt for secure cookie
                     $encodedCookieValue = base64_encode($salt . $username);
                     // setcookie(key, value, expire, path, domain, secure, httponly);
                     setcookie("rememberLogin", $encodedCookieValue, time() + (86400 * 30), "/"); // 86400 = 1 day / secure, http only
                     
-                // if rememberMe not checked, set cookie to expire after 30 minutes and when closing browser
+                // if rememberMe not checked, don't set cookie
                 } else {
-                    // echo " rememberMe NOT checked: " . $rememberMe;
-                    // setcookie("username", $username, time() - (86400)); // 86400 = 1 day / secure, http only
-                    // setcookie("password", $password, time() - (86400)); // 86400 = 1 day / secure, http only
-                    // session_set_cookie_params(0);
+                    // echo " rememberMe NOT checked: ";
                 }
-            
-                // echo " // the following was set cookie ins userService.php: " . $_COOKIE["username"];
-                
+               
                 //header("Refresh:0; url=../../../Booktopia/Frontend/sites/index.php");
                 return true;
                 
             } else {
-                // password incorrect
                 // error - password incorrect
                 return "Passwort ist nich korrekt.";
             }
@@ -220,8 +151,6 @@ class UserService {
 
         // unset cookies
         if (isset($_COOKIE['rememberLogin'])) {
-            // echo " // Unset cookie: " . $_COOKIE['rememberLogin'];
-            // unset($_COOKIE['username']);
             setcookie("rememberLogin", "", time() - 3600, "/"); // 86400 = 1 day / secure, http only
         }       
 
@@ -264,12 +193,8 @@ class UserService {
                 // $userData["creditCard"] = $row['creditCard'];
                 $userData["active"] = $row['active'];
                 $userData["admin"] = $row['admin'];
-
-                // return $userData;
             }
-            
-            // return $userData;
-            
+                        
         }
         
         return $userData;
@@ -286,8 +211,6 @@ class UserService {
     // get session variables
     public function getSession() {
 
-        // echo " // getSession in userServie.php reached";
-
         $userSession = array();
 
         // check if user is logged in and which role he has
@@ -297,29 +220,18 @@ class UserService {
             $userSession['sessionUserid'] = $_SESSION['userid'];
             $userSession['sessionAdmin'] = $_SESSION['admin'];
             $userSession['sessionActive'] = $_SESSION['active'];
-            // $userSession['sessionLoggedIn'] = $_SESSION['loggedIn'];
 
-            // echo username from userSession array
-            // echo " // username from userSession array in userService.php: " . $userSession['sessionUsername'];
-            
             return $userSession;
 
         } elseif (isset($_COOKIE["rememberLogin"])) {
             
-            // echo " // COOKIE SET: " . $_COOKIE["username"];
-
             $encodedCookieRememberLogin = $_COOKIE["rememberLogin"];
 
             $decodedCookieRememberLogin = base64_decode($encodedCookieRememberLogin);
-            // $decodedSalt = substr($decodedCookieRememberLogin, 0, 8);
             $decodedUsernameFromCookie = substr($decodedCookieRememberLogin, 8);
-
-            // echo " // decodedSalt: " . $decodedSalt;
-            // echo " // decodedCookieRememberLogin: " . $decodedUsernameFromCookie;
 
             // check if user exists with prepared statement
             $sql = "SELECT * FROM user WHERE username = ?";
-            // $sql = "SELECT * FROM user WHERE username = ? LIMIT 1";
             $stmt = $this->con->prepare($sql);
             $stmt->bind_param("s", $decodedUsernameFromCookie);
             $stmt->execute();
@@ -382,7 +294,6 @@ class UserService {
                     return true;
                     
                 } else {
-                    // password incorrect
                     // error - password incorrect
                     return "Passwort ist nich korrekt.";
                 }
@@ -414,9 +325,7 @@ class UserService {
         $username = $editedUser['username'];
         // $password = $editedUser['password'];
         // $creditCard = $editedUser['creditCard'];
-
-        // echo " // saveEditedUserData in userService.php reached for user: " . $username . "<br>";
-
+        
         // check if user already exists with prepared statement
         $sql = "SELECT * FROM user WHERE username = ?";
         $stmt = $this->con->prepare($sql);
@@ -435,10 +344,12 @@ class UserService {
             $stmt->execute();
             $result = $stmt->get_result();
             if ($result->affected_rows > 0) {
+                
                 // user updated
-                // echo " // Nutzerdaten aktualisiert.";
                 header("Refresh:0; url=../profile.php");
+                
             } else {
+                
                 // error - user not updated
                 echo " // Fehler: Nutzerdaten konnten nicht aktualisiert werden.";
             }
@@ -455,10 +366,8 @@ class UserService {
     //          GET ORDER DATA
     // ************************************************************
     
-    // get user data
+    // get order data
     public function getOrderData() {
-
-        // echo " // getOrderData in userServie.php reached";
 
         $orderData = array();
 
@@ -478,7 +387,7 @@ class UserService {
             if ($result->num_rows > 0) {
 
                 // user exits: get all orders from this user with prepared statement and save in array
-                $sql = "SELECT * FROM orders WHERE userid = ?";
+                $sql = "SELECT * FROM orders WHERE userid = ? ORDER BY orderDate ASC";
                 $stmt = $this->con->prepare($sql);
                 $stmt->bind_param("i", $row['userid']);
                 $stmt->execute();
@@ -488,37 +397,116 @@ class UserService {
                 // save array with orders in $orderData
                 $orderData = $result->fetch_all(MYSQLI_ASSOC);
 
-                // $orderData['orderId'] = $row['orderId'];
-                // $orderData['orderDate'] = $row['orderDate'];
-                
-                // echo " // orderData in userService.php: " . $orderData;
-                // echo " // orderId in getOrderData in userService.php row 0: " . $orderData[0]['orderId'];
-                // echo " // orderDate in getOrderData in userService.php: " . $orderData['orderDate'];
-                
-
-                // return $orderData;
             }
             
-            // return $orderData;
-            
         }
-        
         return $orderData;
+    }
 
+
+
+
+    // ************************************************************
+    //          GET ORDER DATA BY ORDER ID
+    // ************************************************************
+    
+    // get order data
+    public function getOrderDataByOrderId($orderId) {
+
+        $orderData = array();
+
+        if (isset($_SESSION["username"])) {
+            // active session --> user is logged in
+
+            $username = $_SESSION["username"];
+
+            // check if user exists with prepared statement
+            $sql = "SELECT * FROM user WHERE username = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            // $row = $result->fetch_assoc();
+            
+            if ($result->num_rows > 0) {
+
+                // user exits: check if order exists with prepared statement
+                $sql = "SELECT * FROM orders WHERE orderId = ?";
+                $stmt = $this->con->prepare($sql);
+                $stmt->bind_param("i", $orderId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                // $row = $result->fetch_assoc();
+                
+
+                if ($result->num_rows > 0) {
+                                        
+                    // order exits: save array with order data in $orderData
+                    $orderData = $result->fetch_all(MYSQLI_ASSOC);                    
+                    
+                }
+            }
+        }
+        return $orderData;
+    }
+
+
+
+    // ************************************************************
+    //          GET ORDER DETAILS BY ORDER ID
+    // ************************************************************
+
+    // get order details for specific orderId
+    public function getOrderDetails($clickedOrderId) {
+
+        $orderDetails = array();
+
+        if (isset($_SESSION["username"])) {
+            // active session --> user is logged in
+
+            $username = $_SESSION["username"];
+
+            // check if user exists with prepared statement
+            $sql = "SELECT * FROM user WHERE username = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            // $row = $result->fetch_assoc();
+            
+            if ($result->num_rows > 0) {
+
+                // user exits: check if order exists with prepared statement
+                $sql = "SELECT * FROM orders WHERE orderId = ?";
+                $stmt = $this->con->prepare($sql);
+                $stmt->bind_param("i", $clickedOrderId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                // $row = $result->fetch_assoc();
+                
+                if ($result->num_rows > 0) {
+                    
+                    // order exits: get all order items from this order with prepared statement and save in array
+                    $sql = "SELECT * FROM order_details WHERE orderId = ?";
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->bind_param("i", $clickedOrderId);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    // $row = $result->fetch_assoc();
+                    
+                    // save array with order items in $orderDetails
+                    $orderDetails = $result->fetch_all(MYSQLI_ASSOC);
+                    
+                }
+                
+            }
+        }
+        return $orderDetails;
     }
 
        
-    /* public function delete(User $user) {
-        
-        // Implementieren Sie den Code, um einen vorhandenen Benutzer aus der Datenquelle zu löschen
-        // Beispiel:
-        // Database::execute("DELETE FROM users WHERE id = ?", [$user->getId()]);
-        
-        return true;
-    } */
-
     // Close connection
     public function closeConnection() {
         $this->con->close();
     }
-}
+} 

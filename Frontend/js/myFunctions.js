@@ -5,17 +5,14 @@ $(document).ready(function () {
 
     // when clicked button with id="btnSubmitLogin" in login.php call function loginUser()"
     $("#btnSubmitLogin").on("click", function() {
-        // console.log("loginUser() called");
         loginUser();
     });
 
     $("#btnSubmitRegistration").on("click", function () {
-        // console.log("registerUser() called");
         registerUser();
     });
 
     $("#navLogout").on("click", function() {
-        // console.log("logoutUser() called");
         logoutUser();
     });
 
@@ -25,11 +22,30 @@ $(document).ready(function () {
     // load order overview for customer in orderOverviewCustomer.php
     loadOrderOverviewCustomer();
 
+    // when clicked button from class showOrderDetails fill page invoice.php
+    $(".showOrderDetails").on("click", function() {
+        var orderDetailsForOrderId = $(this).attr("id");
+        showOrderDetails(orderDetailsForOrderId);
+
+        // if subtable is visible, hide it
+        if ($(this).hasClass("active")) {
+            $(".subtable-row").hide();
+            $(this).removeClass("active");
+        } else {
+            // if subtable is not visible, show it
+            $(".subtable-row").hide();
+            $(this).addClass("active");
+            $(this).closest("tr").next().show();
+        }
+    });
+
     // when clicked button from class showInvoiceCustomer fill page invoice.php
-    /* $(".showInvoiceCustomer").on("click", function() {
+    $(".showInvoiceCustomer").on("click", function() {
         var invoiceForOrderNo = $(this).attr("id");
+        // link to page invoice.php
+        window.location.href = "../sites/invoice.php";
         createInvoice(invoiceForOrderNo);
-    }); */
+    });
     
     $("#btnEditProfile").on("click", function() {
         // make profile form fields editable
@@ -44,7 +60,6 @@ $(document).ready(function () {
         $("#buttonDivProfile").append("&nbsp;&nbsp;<a href='profile.php' class='btn btn-secondary' id='btnCancelEditeProfile'>Abbrechen</a>");
 
         $("#btnSaveProfile").on("click", function() {
-            // var passwordForSavingProfile = prompt("Bitte geben Sie Ihr Passwort ein:");
             saveEditedUserData();    
         });
     
@@ -130,13 +145,9 @@ function registerUser() {
     var password = $("#passwordRegistration").val();
     var passwordConfirmed = $("#passwordConfirmedRegistration").val();
     // var creditCard = $("#creditCardRegistration").val();
-    
-    // console.log("registerUser() called");
-    // console.log("password: " + password);
-    // console.log("passwordConfirmed: " + passwordConfirmed);
 
     // Client validation
-    if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "" || passwordConfirmed == "" || creditCard == "") {
+    if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "" || passwordConfirmed == "") {
         console.log("Client validation failed!");
         $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
         // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
@@ -153,8 +164,6 @@ function registerUser() {
     }
 
     password = hashPasswordWithSHA512(password);
-    // console.log("HashedPassword before ajax call:");
-    // console.log(password);
     
     var user = {
         salutation: salutation,
@@ -204,8 +213,6 @@ function loginUser() {
 
     var username = $("#usernameLogin").val();
     var password = $("#passwordLogin").val();
-    // console.log("username: " + username);
-    //var rememberMe = $("#rememberMeLogin").prop("checked");
     var rememberMe = $("#rememberMeLogin").is(":checked");
     console.log("rememberMe: " + rememberMe);
 
@@ -218,8 +225,6 @@ function loginUser() {
     }
 
     password = hashPasswordWithSHA512(password);
-    // console.log("Login - HashedPassword before ajax call:");
-    // console.log(password); 
 
     $.ajax({
         type: "GET",
@@ -233,47 +238,17 @@ function loginUser() {
         cache: false,
         success: function (response) {
 
-            // console.log("Response from loginUser():");
-            // console.log(response.code);
-            /* console.log("1: " + JSON.stringify(code));
-            console.log("2: " + message);
-            console.log("3: " + array); */
             alert('Sie wurden erfolgreich eingeloggt.');
             window.location.href = "../sites/index.php";
 
-            //if (response === "success") {
-                // Erfolgreich eingeloggt
-                // Hier kannst du entsprechende Aktionen durchführen, z.B. Weiterleitung zur Startseite
-
-                // Set session variable for remember me
-                /* if ($("#rememberMe").is(":checked")) {
-                    sessionStorage.setItem("username", username);
-                } */
-
-                // Redirect to index.html
-
-                //window.location.href = "../sites/index.php";
-
-            //} else if (response === "error") {
-                // Fehler beim Einloggen
-                // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
-                // Append error message to id="loginForm"
-                //$("#loginForm").append("<p style='color:red; font-weight:bold;'>Fehler beim Einloggen!</p>");
-            //} else {
-                // Ungültige Antwort
-                // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
-                //alert("Ungültige Antwort vom Server");
-            //}
         },
         error: function (e) {
-            // Fehler beim AJAX-Aufruf
-
             var errorMessage = e.responseText;           
             console.log(errorMessage);
             alert(errorMessage);
             window.location.href = "../sites/login.php";
 
-            // Hier kannst du eine Fehlermeldung anzeigen oder andere Aktionen durchführen
+            // Fehlermeldung anzeigen oder andere Aktionen durchführen
             //$("#errorLogin").append("<p style='color:red; font-weight:bold;'>Fehler beim Login AJAX Aufruf!</p>");
         }
     });
@@ -296,8 +271,6 @@ function logoutUser() {
         dataType: "html",
         cache: false,
         success: function (response) {
-            //console.log("Response from logoutUser():");
-            // console.log(response);
             alert("Sie wurden erfolgreich ausgeloggt.");
             window.location.href = "index.php";
         },
@@ -328,11 +301,7 @@ function getSessionVariables() {
         cache: false,
         async: false,
         success: function (response) {
-
-            // console.log("Response from api.php in getSessionVariables():");
-            // console.log(response);
-            userSession = response;
-            
+            userSession = response;            
         },
 
         error: function () {
@@ -405,11 +374,8 @@ function getUserData() {
         cache: false,
         async: false,
         success: function (response) {
-
-            // console.log("Response from api.php in getUserData():");
             console.log(response);
-            userData = response;
-            
+            userData = response;            
         },
 
         error: function () {
@@ -417,7 +383,6 @@ function getUserData() {
             console.log("Error in error function of getUserData()");
         }
     });
-
     return userData;
 }
 
@@ -431,9 +396,6 @@ function saveEditedUserData() {
     var passwordForSavingProfile = prompt("Bitte geben Sie Ihr Passwort ein:");
     passwordForSavingProfile = hashPasswordWithSHA512(passwordForSavingProfile);
     var passwordCheck = checkPasswordForSavingProfile(passwordForSavingProfile);
-
-    // alert("passwordCheck: " + passwordCheck);
-    console.log("passwordCheck in saveEditedUserData: " + passwordCheck);
 
     // if entered password matches password in database save edited user data
     if (passwordCheck) {
@@ -453,7 +415,7 @@ function saveEditedUserData() {
         // var active = $("#activeProfile").val();
         // var admin = $("#adminProfile").val();
 
-        if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "" || creditCard == "") {
+        if (salutation == null || firstName == "" || lastName == "" || address == "" || postcode == "" || location == "" || email == "" || username == "" || password == "") {
             console.log("Client validation failed!");
             $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
             // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
@@ -461,7 +423,6 @@ function saveEditedUserData() {
         }
 
         // !!!! noch offen E-Mail Prüfung / password Regex / creditCard Regex
-
 
         password = hashPasswordWithSHA512(password);
     
@@ -489,21 +450,15 @@ function saveEditedUserData() {
             dataType: "html",
             cache: false,
             success: function (response) {
-    
-                // console.log("Response from saveEditedUserData():");
-                // console.log(response);
                 alert('Nutzerdaten wurden erfolgreich geändert.');
                 window.location.href = "../sites/profile.php";
-    
             },
             error: function () {
             }
         });
         
     } else {
-
         alert("Falsches Passwort!");
-
     }
 
     
@@ -538,9 +493,7 @@ function checkPasswordForSavingProfile(passwordForSavingProfile) {
         }        
 
     });
-
-    return passwordCheck;   
-    
+    return passwordCheck;      
 }
 
 
@@ -550,8 +503,6 @@ function checkPasswordForSavingProfile(passwordForSavingProfile) {
 // ************************************************************
 
 function loadOrderOverviewCustomer() {
-
-    // console.log("loadOrderOverviewCustomer() reached in myFunctions.js");
 
     // get array with order data
     var orderData = getOrderData();
@@ -568,9 +519,107 @@ function loadOrderOverviewCustomer() {
         var quantity = orderData[i]['quantity'];
         var totalPrice = orderData[i]['totalPrice'] + " EUR";
 
-        $("#orderOverviewCustomerTableBody").append("<tr><td>" + orderId + "</td><td>" + orderDate + "</td><td>" + deliveryDate + "</td><td>" + deliveryAddress + "</td><td class='deliveryStatus" + deliveryStatus + "'>" + deliveryStatus + "</td><td>" + quantity + "</td><td>" + totalPrice + "</td><td><button type='button' id='orderDetails" + orderId + "' class='btn btn-primary showOrderDetails'>Details</button></td><td><button type='button' id='invoiceByOrderId" + orderId + "' class='btn btn-primary showInvoiceCustomer'>Rechnung drucken</button></td></tr>");
+        $("#orderOverviewCustomerTableBody").append("<tr id='rowOrderId" + orderId +"'><td>" + orderId + "</td><td>" + orderDate + "</td><td>" + deliveryDate + "</td><td>" + deliveryAddress + "</td><td class='deliveryStatus" + deliveryStatus + "'>" + deliveryStatus + "</td><td>" + quantity + "</td><td>" + totalPrice + "</td><td><button type='button' id='orderDetails" + orderId + "' class='btn btn-primary showOrderDetails'>Details</button></td><td><button type='button' id='invoiceByOrderId" + orderId + "' class='btn btn-primary showInvoiceCustomer'>Rechnung drucken</button></td></tr>");
     }
 }
+
+
+// ************************************************************
+//          CREATE INVOICE PAGE
+// ************************************************************
+
+function createInvoice(invoiceForOrderNo) {
+
+    console.log("createInvoice() reached in myFunctions.js");
+
+    var appendOrderDetails = "";
+    var totalPrice = 0;
+
+   var clickedOrderId = parseInt(invoiceForOrderNo.match(/\d+/)[0]);
+   console.log("clickedOrderId: " + clickedOrderId);
+
+    // add customer data to invoice
+    var customerData = getUserData();
+    var customerSalutation = customerData['salutation'];
+    var customerFirstName = customerData['firstName'];
+    var customerLastName = customerData['lastName'];
+    var customerAddress = customerData['address'];
+    var customerPostcode = customerData['postcode'];
+    var customerLocation = customerData['location'];
+    var customerId = customerData['userid'];
+
+    console.log("customerSalutation: " + customerSalutation);
+
+    // create invoice customer data
+    $("#invoiceCustomerSalutation").text(customerSalutation);
+    $("#invoiceCustomerName").text(customerFirstName + " " + customerLastName);
+    $("#invoiceCustomerAddress").text(customerAddress);
+    $("#invoiceCustomerZIPLocation").text(customerPostcode + " " + customerLocation);
+
+    //$("#invoiceCustomerData").append("<p>" + customerSalutation + "</p><p>" + customerFirstName + " " + customerLastName + "</p><p>" + customerAddress + "</p><p>" + customerPostcode + " " + customerLocation + "</p>");
+
+    // create random invoice number
+    var min = 1;
+    var max = 100;
+    var randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    // invoice date: date today
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    // create invoice details
+    $("#invoiceDate").text("Rechnungsdatum: " + dd + "." + mm + "." + yyyy);
+    //$("#invoiceDate").text("Rechnungsdatum: " + dd + "." + addLeadingZero(mm) + "." + addLeadingZero(yyyy));
+    $("#invoiceNumber").text("Rechnungs-Nr.: " + randomNumber);
+    $("#invoiceCustomerId").text("Kunden-Nr.: " + customerId);
+    $("#invoiceOrderId").text("Bestell-Nr.: " + clickedOrderId);
+    $("#invoiceDeliveryDate").text("Lieferdatum: " + dd + "." + mm + "." + yyyy);
+
+    // get array with order data
+    var orderData = getOrderDataByOrderId(clickedOrderId);
+    totalPrice = orderData['totalPrice'];
+
+    var orderDetails = getOrderDetails(clickedOrderId);
+
+
+    // get every item from array order details by iterating through it and append it to table
+    for (var i = 0; i < orderDetails.length; i++) {
+        var pos = i + 1;
+        var orderDetailsArticleQuantity = orderDetails[i]['quantity'];
+        var orderDetailsArticleId = orderDetails[i]['itemId'];
+
+        console.log("orderDetailsArticleQuantity: " + orderDetailsArticleQuantity);
+
+        // get book details for every order position
+        var bookDetails = getBookDetails(orderDetailsArticleId);
+
+        console.log("bookDetails: " + bookDetails);
+
+        var bookDetailsIsbn = bookDetails[0]['isbn'];
+        var bookDetailsTitle = bookDetails[0]['titel'];
+        var bookDetailsAutor = bookDetails[0]['autor'];
+        var bookDetailsPrice = bookDetails[0]['preis'];
+        var totalPerPos = orderDetailsArticleQuantity * bookDetailsPrice;
+
+        console.log("bookDetailsIsbn: " + bookDetails[0]['isbn']);
+
+        appendOrderDetails = appendOrderDetails + "<tr><td>" + pos + "</td><td>" + bookDetailsIsbn + "</td><td>" + bookDetailsTitle + "</td><td>" + bookDetailsAutor + "</td><td>" + bookDetailsPrice + " EUR</td><td>" + orderDetailsArticleQuantity + "</td><td class='totalPricePerPosition'>" + totalPerPos + " EUR</td></tr>";
+
+    }
+
+    $("#invoiceTableBody").append(appendOrderDetails);
+
+    var subTotal = totalPrice / 1.10;
+    var tax = totalPrice - subTotal;
+    $("#subtotal").text(subTotal);
+    $("#tax").text(tax);
+    $("#total").text(totalPrice);
+
+}
+
+
 
 
 // ************************************************************
@@ -588,7 +637,6 @@ function getOrderData() {
         cache: false,
         async: false,
         success: function (response) {
-
             console.log("Response from api.php in getOrderData():");
             console.log(response);
             orderData = response;
@@ -605,11 +653,13 @@ function getOrderData() {
 
 }
 
+
+
 // ************************************************************
 //          GET ORDER DATA BY ORDER ID
 // ************************************************************
 
-/* function getOrderData(orderId) {
+function getOrderDataByOrderId(orderId) {
 
     var orderData = [];
 
@@ -623,158 +673,131 @@ function getOrderData() {
         cache: false,
         async: false,
         success: function (response) {
-
-            console.log("Response from api.php in getUserData():");
+            console.log("Response from api.php in getOrderDataByOrderId():");
             console.log(response);
-            userData = response;
-            
+            userData = response;            
         },
 
         error: function () {
             // Error handling
-            console.log("Error in error function of getUserData()");
+            console.log("Error in error function of getOrderDataByOrderId()");
         }
     });
 
     return orderData;    
 
-} */
+}
 
-
-// ************************************************************
-//          SHOW ORDER DETAILS IN MODAL
-// ************************************************************
-
-/* function showOrderDetails(ID) {
-
-    $orderDetails = getOrderDataById(ID);
-
-
-    // append order data to modal "modalOrderDetails"
-    $("modalOrderDetails").append(
-        "<div class='modal fade' id='showDetails'" + ID + "tabindex='-1' role='dialog' aria-labelledby='statusModalLabel' aria-hidden='true'>
-            <div class='modal-dialog' role='document'>
-                <div class='modal-content'>
-                    <div class='modal-header'>
-                        <h5 class='modal-title'>Bestelldetails</h5>
-                        <input type='hidden' id='reservationIDstatus' name='reservationIDstatus' value='" + ID + "'></input>
-                    </div>
-                    <div class='modal-body'>                            
-                        <div class='row mb-5 gx-5'>
-                            <div class='mb-5 mb-xxl-0'>
-                                <div class='bg-secondary-soft px-4 py-5 rounded'>
-                                    <div class='row'>
-                                        <h4 class='mb-4 mt-0'>Bestelldetails</h4>
-                                        <div class='col-md-6'>
-                                            <p><strong>Bestellnummer:</strong></p>
-                                            <p>" + ID + "</p>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <table class="table tableInvoiceDetails">
-                                            <thead>
-                                                <tr>
-                                                    <th scope='col'>Pos.</th>
-                                                    <th scope='col'>Artikel-Nr.</th>
-                                                    <th scope='col'>Bezeichnung</th>
-                                                    <th scope='col'>Einzelpreis</th>
-                                                    <th scope='col'>Menge</th>
-                                                    <th scope='col'>Gesamtpreis</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="invoiceTableBody">
-                                                <tr>
-                                                    <th scope=" row">1</th>
-                                                    <td>1234</td>
-                                                    <td>Der mit dem Wolf tanzt</td>
-                                                    <td>16 EUR</td>
-                                                    <td>1</td>
-                                                    <td>16 EUR</td>
-                                                </tr>" +
-                                                // for each order item get data
-                                            + "</tbody>
-                                        </table> 
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class='modal-footer'>
-                        <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Schließen</button>                                                            </div>
-                    </div>
-                </div>
-            </div>
-        </div>");
-
-    
-    
-
-} */
 
 
 
 // ************************************************************
-//          CREATE INVOICE PAGE
+//          SHOW ORDER DETAILS IN SUBTABLE
 // ************************************************************
 
-/* function createInvoice(invoiceForOrderNo) {
+function showOrderDetails(orderDetailsForOrderId) {
 
-    // add customer data to invoice
-    var customerData = getCustomerData();
-    var customerSalutation = customerData['salutation'];
-    var customerFirstName = customerData['firstName'];
-    var customerLastName = customerData['lastName'];
-    var customerAddress = customerData['address'];
-    var customerPostcode = customerData['postcode'];
-    var customerLocation = customerData['location'];
-    var customerId = customerData['userid'];
+    var appendOrderDetails = "";
 
-    $("#invoiceCustomerSalutation").val(customerSalutation);
-    $("#invoiceCustomerName").val(customerFirstName + " " + customerLastName);
-    $("#invoiceCustomerAddress").val(customerAddress);
-    $("#invoiceCustomerZIPLocation").val(customerPostcode + " " + customerLocation);
+   var clickedOrderId = parseInt(orderDetailsForOrderId.match(/\d+/)[0]);
+   console.log("clickedOrderId: " + clickedOrderId);
 
-    // create random invoice number
-    var min = 1;
-    var max = 100;
-    var randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+   var orderDetails = getOrderDetails(clickedOrderId);
 
-    // date today
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
+   // get every item from array by iterating through it and append it to table
+    for (var i = 0; i < orderDetails.length; i++) {
+        var pos = i + 1;
+        var orderDetailsArticleQuantity = orderDetails[i]['quantity'];
+        var orderDetailsArticleId = orderDetails[i]['itemId'];
 
-    $("#invoiceNumber").val("Rechnungs-Nr.: " + randomNumber);
-    $("#invoiceDate").val("Rechnungsdatum: " + dd + "." + addLeadingZero(mm) + "." + addLeadingZero(yyyy));
-    $("#customerId").val("Kunden-Nr.: " + customerId);
+        console.log("orderDetailsArticleQuantity: " + orderDetailsArticleQuantity);
 
-    // get array with order data
-    var orderData = getOrderDataById(invoiceForOrderNo);
+        // get book details for every order position
+        var bookDetails = getBookDetails(orderDetailsArticleId);
 
-    // get every items from array by iterating through it and append it to table
-    for (var i = 0; i < orderData.length; i++) {
-/*         var orderId = orderData['orderId'];
-        var orderDate = orderData['orderDate'];
-        var deliveryStatus = orderData['deliveryStatus'];
-        var deliveryAddress = orderData['deliveryAddress'];
-        var totalPrice = orderData['totalPrice'];
-        var orderDetails = orderData['orderDetails']; */
-/*        var orderPosition = orderData['orderPosition'];
+        var bookDetailsIsbn = bookDetails[0]['isbn'];
+        var bookDetailsTitle = bookDetails[0]['titel'];
+        var bookDetailsAutor = bookDetails[0]['autor'];
+        var bookDetailsPrice = bookDetails[0]['preis'];
+        var totalPerPos = orderDetailsArticleQuantity * bookDetailsPrice;
 
-        // get information for every order position by iterating through it and append it to table
-        for (var j = 0; j < orderPosition.length; j++) {
-            var orderPositionArticleNo = orderPosition['articleNo'];
-            var orderPositionArticleName = orderPosition['articleName'];
-            var orderPositionArticlePrice = orderPosition['articlePrice'];
-            var orderPositionArticleQuantity = orderPosition['articleQuantity'];
-            var orderPositionArticleTotal = orderPositionArticleQuantity * orderPositionArticlePrice;
+        appendOrderDetails = appendOrderDetails + "<tr><td>" + pos + "</td><td>" + bookDetailsIsbn + "</td><td>" + bookDetailsTitle + "</td><td>" + bookDetailsAutor + "</td><td>" + bookDetailsPrice + " EUR</td><td>" + orderDetailsArticleQuantity + "</td><td class='totalPricePerPosition'>" + totalPerPos + " EUR</td></tr>";
 
-            $("#invoiceTableBody").append("<tr><td>" + (j+1) + "</td><td>" + orderPositionArticleNo + "</td><td>" + orderPositionArticleName + "</td><td>" + orderPositionArticlePrice + " EUR</td><td>" + orderPositionProductQuantity + "</td><td class='totalPricePerPosition'>" + orderPositionArticleTotal + " EUR</td></tr>");
-        }
     }
-} */
+
+    $("#rowOrderId" + clickedOrderId).after("<tr class='subtable-row'><td colspan='8'><div class='subtable'><table class='table table-striped'><thead><tr><th scope='col'>Pos</th><th scope='col'>ISBN</th><th scope='col'>Titel</th><th scope='col'>Autor</th><th scope='col'>Einzelpreis</th><th scope='col'>Menge</th><th scope='col'>Zeilensumme</th></tr></thead><tbody></tbody>" + appendOrderDetails + "</tbody></table></div></td></tr>");
+
+}
+
+
+// ************************************************************
+//          GET ORDER DETAILS BY ORDER ID
+// ************************************************************
+
+function getOrderDetails(clickedOrderId) {
+
+    var orderDetails = [];
+
+    $.ajax({
+        type: "GET",
+        url: "../../Backend/api.php" + "?getOrderDetails",
+        data: {
+            clickedOrderId: clickedOrderId
+        },
+        dataType: "json",
+        cache: false,
+        async: false,
+        success: function (response) {
+            console.log("Response from api.php in getOrderDetails():");
+            console.log(response);
+            orderDetails = response;            
+        },
+
+        error: function (e) {
+            // Error handling
+            console.log("Error in error function of getOrderDetails()");
+        }
+    });
+
+    return orderDetails; 
+ 
+ }
+
+
+
+ // ************************************************************
+//          GET BOOK DETAILS BY ARTICLE / ITEM ID
+// ************************************************************
+
+function getBookDetails(orderDetailsArticleId) {
+
+    var bookDetails = [];
+
+    $.ajax({
+        type: "GET",
+        url: "../../Backend/api.php" + "?getBookDetails",
+        data: {
+            orderDetailsArticleId: orderDetailsArticleId
+        },
+        dataType: "json",
+        cache: false,
+        async: false,
+        success: function (response) {
+            console.log("Response from api.php in getBookDetails():");
+            console.log(response);
+            bookDetails = response;
+            console.log("isbn from bookDetails: " + bookDetails[0]['isbn']);            
+        },
+
+        error: function (e) {
+            // Error handling
+            console.log("Error in error function of getBookDetails()");
+        }
+    });
+
+    return bookDetails; 
+ 
+ }
 
 
 

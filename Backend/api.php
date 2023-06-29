@@ -13,6 +13,7 @@ require (dirname(__FILE__) . "\models\user.php");
 require (dirname(__FILE__) . "\logic\services\userService.php");
 require (dirname(__FILE__) . "\models\book.php");
 require (dirname(__FILE__) . "\logic\services\bookService.php");
+require (dirname(__FILE__) . "\logic\session.php");
 
 // an instance of the API class is created
 $api = new Api($con, $tbl_user, $tbl_book);
@@ -64,24 +65,16 @@ class Api {
     //          GET REQUESTS
     // ************************************************************
     
-    // Verarbeitung von GET-Anfragen
     // Hier können verschiedene GET-Anfragen an die entsprechenden Services weitergeleitet werden.
     public function processGet() {
 
         // login user 
         if (isset($_GET["loginUser"])) {
-            
-            // echo "<script>console.log('processGet - loginUser - in api.php reached');</script>";
-            
-            // Verarbeite Login
             $username = $_GET["username"];
             $password = $_GET["password"];
             $rememberMe = $_GET["rememberMe"];
-            // echo "username in api.php: " . $username . "<br>";
-            // echo "password in api.php: " . $password . "<br>";
-            
+           
             $result = $this->userService->loginUser($username, $password, $rememberMe);
-
                 if ($result === true) {
                     $this -> success(200,  "Login erfolgreich!", []);
                 } else {
@@ -91,32 +84,44 @@ class Api {
         
         // geht Session Variables and check for cookie
         } elseif (isset($_GET["getSession"])) {
-
             $userSession = $this->userService->getSession();
             $this->success(200, "", $userSession);
         
         // get user data
         } elseif (isset($_GET["getUserData"])) {
-
             $userData = $this->userService->getUserData();
             $this->success(200, "", $userData);
             
         // get order data
         } elseif (isset($_GET["getOrderData"])) {
-            // echo "getOrderData in api.php reached";
             $orderData = $this->userService->getOrderData();
-            // echo "orderData in api.php: " . $orderData . "<br>";
             $this->success(200, "", $orderData);
         
+        // get order data by Id
+        } elseif (isset($_GET["getOrderDataByOrderId"])) {
+            $orderId = $_GET["orderId"];
+            $orderData = $this->userService->getOrderDataByOrderId($orderId);
+            $this->success(200, "", $orderData);
+        
+        // get order details for specific orderId
+        } elseif (isset($_GET["getOrderDetails"])) {
+            $clickedOrderId = $_GET["clickedOrderId"];
+            $orderDetails = $this->userService->getOrderDetails($clickedOrderId);
+            $this->success(200, "", $orderDetails);
+        
+        // get book details for specific articleId / itemId
+        } elseif (isset($_GET["getBookDetails"])) {
+            $orderDetailsArticleId = $_GET["orderDetailsArticleId"];
+            $bookDetails = $this->bookService->getBookDetails($orderDetailsArticleId);
+            $this->success(200, "", $bookDetails);
+    
         // logout user
         } elseif (isset($_GET['logoutUser'])) {
-
-            // echo " processGet - logoutUser - in api.php reached";
             $this->userService->logoutUser();
             $this->success(200, "Logout erfolgreich!", []);
-            
-        } elseif (isset($_GET["checkPasswordForSavingProfile"])) {
 
+        // check if correct password was entered for saving profile
+        } elseif (isset($_GET["checkPasswordForSavingProfile"])) {
             $passwordForSavingProfile = $_GET["passwordForSavingProfile"];
             $result = $this->userService->checkPassword($passwordForSavingProfile);
 
@@ -127,22 +132,14 @@ class Api {
                 }
         
         
-        } /* } elseif (isset($_GET["book"])) {
+        /* } elseif (isset($_GET["book"])) {
             // Produkt erstellen
-            // $this->productService->createBook(); 
-        
-            
-        } */
-
-            
-        /* if (isset($_GET["users"])) {
-            $users = $this->userService->findAll();
-            $this->success(200, $users);
-        } elseif (isset($_GET["book"])) {
+            // $this->productService->createBook(); */       
+        /* } elseif (isset($_GET["book"])) {
             $books = $this->bookService->findAll();
-            $this->success(200, $books);
-        } */ else { 
-            $this->error(400, [], "Bad Request - invalid parameters " . http_build_query($_GET));
+            $this->success(200, $books); */
+        } else { 
+            $this->error(400, [], "GET: Bad Request - invalid parameters " . http_build_query($_GET));
         }
     }
 
@@ -151,11 +148,12 @@ class Api {
     //          POST REQUESTS
     // ************************************************************
     
+    // Hier können verschiedene POST-Anfragen an die entsprechenden Services weitergeleitet werden.
     public function processPost() {
 
         if (empty($_POST)) {
             // Error
-            echo "Empty post request";
+            echo "Empty post request.";
         }
         
         // register user
@@ -164,14 +162,12 @@ class Api {
             $this->userService->saveUser($user);        
         
         // Update User
-        } if (isset($_POST["saveEditedUserData"])) {             
+        } elseif (isset($_POST["saveEditedUserData"])) {             
             $editedUser = $_POST["editedUser"];
-            // echo "saveEditedUserData in api.php reached";
-            // echo "editedUser in api.php: " . $editedUser["firstname"] . "<br>";
             $this->userService->saveEditedUserData($editedUser);
                     
-           } else {
-                $this->error(400, "Bad Request - invalide Parameter" . http_build_query($_GET), []);
+        } else {
+            $this->error(400, "POST: Bad Request - invalide Parameter" . http_build_query($_GET), []);
         }
     }
 
@@ -181,11 +177,7 @@ class Api {
     // ************************************************************
     
     public function processDelete() {
-        // to be implemented
-
-        // Verarbeitung von DELETE-Anfragen
         // Hier können verschiedene DELETE-Anfragen an die entsprechenden Services weitergeleitet werden.
-
         /* if (isset($_GET["user"])) {
             // Benutzer löschen
             // $this->userService->deleteUser();
@@ -202,7 +194,7 @@ class Api {
     //          PUT REQUESTS
     // ************************************************************
     private function processUpdate() {
-
+        // Hier können verschiedene PUT-Anfragen an die entsprechenden Services weitergeleitet werden.
         /* if (isset($_PUT["saveEditedUserData"])) {             
             $editedUser = $_PUT["editedUser"];
             $this->userService->saveEditedUserData($editedUser);
@@ -229,8 +221,7 @@ class Api {
         echo($message);
         echo(json_encode($array));
         }        
-        exit;
-        
+        exit;        
     }
     
     // format error response
@@ -240,6 +231,5 @@ class Api {
         exit;        
     }
 }
-
 
 ?>

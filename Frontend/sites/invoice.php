@@ -20,7 +20,7 @@
         <div class="content">
             <div class="container">
 
-                <div class="invoiceCustomerData">
+                <div id="invoiceCustomerData">
                     <p id="invoiceCustomerSalutation"></p>
                     <p id="invoiceCustomerName"></p>
                     <p id="invoiceCustomerAddress"></p>
@@ -31,7 +31,9 @@
                 <div class="invoiceDetails">
                     <p id="invoiceDate"></p>
                     <p id="invoiceNumber"></p>
-                    <p id="customerId"></p>
+                    <p id="invoiceCustomerId"></p>
+                    <p id="invoiceOrderId"></p>
+                    <p id="invoiceDeliveryDate"></p>
                 </div>
 
                 <h1>Rechung</h1>
@@ -41,39 +43,16 @@
                     <table class="table tableInvoiceDetails">
                         <thead>
                             <tr>
-                                <th scope="col">Pos.</th>
-                                <th scope="col">Artikel-Nr.</th>
-                                <th scope="col">Bezeichnung</th>
-                                <th scope="col">Einzelpreis</th>
-                                <th scope="col">Menge</th>
-                                <th scope="col">Gesamtpreis</th>
+                                <th scope='col'>Pos</th>
+                                <th scope='col'>ISBN</th>
+                                <th scope='col'>Titel</th>
+                                <th scope='col'>Autor</th>
+                                <th scope='col'>Einzelpreis</th>
+                                <th scope='col'>Menge</th>
+                                <th scope='col'>Zeilensumme</th>
                             </tr>
                         </thead>
                         <tbody id="invoiceTableBody">
-                            <tr>
-                                <th scope=" row">1</th>
-                                <td>1234</td>
-                                <td>Der mit dem Wolf tanzt</td>
-                                <td>16 EUR</td>
-                                <td>1</td>
-                                <td>16 EUR</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>1111</td>
-                                <td>Winnie Puuh</td>
-                                <td>5 EUR</td>
-                                <td>2</td>
-                                <td>10 EUR</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>3214</td>
-                                <td>Das Haus am See</td>
-                                <td>12 EUR</td>
-                                <td>1</td>
-                                <td>12 EUR</td>
-                            </tr>
                         </tbody>
                     </table>
 

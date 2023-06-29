@@ -1,20 +1,16 @@
 <?php
 
-//require(dirname(__FILE__, 3) . "/config/dbaccess.php");
-// require (dirname(__FILE__, 2) . "\session.php");
-
-
 // bookService Class implements CRUD operations
 
 class BookService {
 
     // get data from MySQL database with SQL statements
     private $con;
-    private $tbl_user; // ????
+    private $tbl_book; // ????
 
-    public function __construct($con, $tbl_user) {
+    public function __construct($con, $tbl_book) {
         $this->con = $con;
-        // $this->tbl_book = $tbl_book; // ????
+        $this->tbl_book = $tbl_book; // ????
     }
 
     // find all books mit prepared statement
@@ -58,10 +54,67 @@ class BookService {
 
 
 
-    // ************************************************************
-    //          ???
-    // ************************************************************
     
+    // ************************************************************
+    //          GET BOOK DETAILS BY ARTICLE / ITEM ID
+    // ************************************************************
+
+    // get book details by article / item id
+    public function getBookDetails($orderDetailsArticleId) {
+
+        // echo " // getBookDetails in bookService.php reached";
+
+        $bookDetails = null;
+
+        if (isset($_SESSION["username"])) {
+            // active session --> user is logged in
+
+            $username = $_SESSION["username"];
+
+            // check if user exists with prepared statement
+            $sql = "SELECT * FROM user WHERE username = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            // $row = $result->fetch_assoc();
+            
+            if ($result->num_rows > 0) {
+
+                // user exits: check if article ID exists with prepared statement
+                $sql = "SELECT * FROM book WHERE id = ?";
+                $stmt = $this->con->prepare($sql);
+                $stmt->bind_param("i", $orderDetailsArticleId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                // $row = $result->fetch_assoc();
+                
+                if ($result->num_rows > 0) {
+                    
+                    // book exits: get all details for this book with prepared statement and save in array
+                    $sql = "SELECT * FROM book WHERE id = ?";
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->bind_param("i", $orderDetailsArticleId);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    // $row = $result->fetch_assoc();
+                    
+                    $bookDetails = $result->fetch_all(MYSQLI_ASSOC);
+
+                    // echo " // bookDetails in bookService.php: " . $bookDetails . "<br>";
+                    
+                }
+                
+            }
+            
+            // return $bookDetails;
+            
+        }
+        
+        return $bookDetails;
+
+    }
+
     
 
        

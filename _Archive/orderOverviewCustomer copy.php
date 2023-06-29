@@ -70,6 +70,37 @@
                                     drucken</button>
                             </td>
                         </tr>
+                        <tr class="subtable-row">
+                            <td colspan="8">
+                                <div class="subtable">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Position</th>
+                                                <th scope="col">Einzelpreis</th>
+                                                <th scope="col">Bezeichnung</th>
+                                                <!-- Weitere Spalten für Positionsdetails -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>10 EUR</td>
+                                                <td>Produkt A</td>
+                                                <!-- Weitere Zellen für Positionsdetails -->
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>13 EUR</td>
+                                                <td>Produkt B</td>
+                                                <!-- Weitere Zellen für Positionsdetails -->
+                                            </tr>
+                                            <!-- Weitere Zeilen für Positionen -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
                         <tr>
                             <th scope="row">3</th>
                             <td>20.06.2023</td>

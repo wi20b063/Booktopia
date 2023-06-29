@@ -94,11 +94,11 @@
                                 minlength="8" class="form-control" required>
                         </div>
 
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <label for="creditCard">Kreditkartennummer:</label><br>
                             <input type="int" name="creditCard" id="creditCardRegistration" placeholder="12345678"
                                 class="form-control">
-                        </div>
+                        </div> -->
 
                         <div class="mb-4 errors" id="errorRegistration"></div>
 
