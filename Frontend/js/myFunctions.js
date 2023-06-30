@@ -104,10 +104,11 @@ function loadNavBar() {
                 
         } else if (sessionAdmin == 0){
             // show logout, profile, shopping cart / hide register, login, products, customers, vouchers
-            $("#navRegister").hide();                
-            $("#navManageProducts").hide();
-            $("#navManageCustomers").hide();
-            $("#navManageVouchers").hide();
+            $("#navRegister").hide();      
+            $("#navAdminDropdown").hide();          
+           // $("#navManageProducts").hide();
+           // $("#navManageCustomers").hide();
+           // $("#navManageVouchers").hide();
             $("#navLogin").hide();
 
             // append welcome message with <li> and <span> to id="navSearch"
@@ -386,6 +387,35 @@ function getUserData() {
     return userData;
 }
 
+/* function getUserData3(targetDiv){
+    const parent = document.getElementById("dynComponentDiv");
+    $("#dynComponentDiv").load('../../Backend/logic/services/UserAdmView.php');
+  } */
+  function getUserData2(targetDiv){
+    var link='../../Backend/logic/services/UserAdmView.php';
+    $.ajax({
+        type:   "POST",
+        url:    link,
+        dataType: "html",
+        success:function(data) {
+            $("#dynComponentDiv").html(data);
+        }
+    });
+    return false;  // for good measure
+};
+
+function fetchAllOrders(targetDiv){
+    var link='../../Backend/logic/services/OrderAdminView.php';
+    $.ajax({
+        type:   "POST",
+        url:    link,
+        dataType: "html",
+        success:function(data) {
+            $("#dynComponentDivUsr").html(data);
+        }
+    });
+    return false;  // for good measure
+};
 
 // ************************************************************
 //          SAVE EDITED USER DATA
@@ -463,6 +493,139 @@ function saveEditedUserData() {
 
     
 }
+
+// ************************************************************
+//          USER-ADMIN routines (can reduce and combine with 
+//                  earlier functions if time permits)
+// ************************************************************
+
+function updateUser(callerID, callerRole){ //formID received to identify which form in modals was submitting the call
+    var callerRole;
+    var user, userId;
+    var password, passwordConfirmed, active, admin; 
+  
+    var userId = callerID; //hidden tag with userId on page
+    //var salutation= document.getElementById("salutationRegistration" + callerID).value; 
+    var firstName= document.getElementById("firstNameRegistration" + userId).value;
+    var lastName= document.getElementById(("lastNameRegistration" + userId)).value;
+    var address= document.getElementById("addressRegistration" + userId).value;
+    var postcode= document.getElementById("postcodeRegistration" + userId).value;
+    var location= document.getElementById("locationRegistration" + userId).value;
+    var email= document.getElementById("emailRegistration" + userId).value;
+    var username= document.getElementById("usernameRegistration" + userId).value;
+    if(callerRole==1){ //AdminRole
+       active= document.getElementById("flexSwitchCheckisActive"+ userId).checked==true ? 1 : 0;
+       admin= document.getElementById("flexSwitchCheckisAdmin" + userId).checked ? 1 : 0;
+    
+    } else
+    {//userRole
+       password = document.getElementById("passwordRegistration" + userId).value;
+       passwordConfirmed = document.getElementById("passwordConfirmedRegistration" + userId).value;
+    }
+  
+    var x = document.getElementById("salutationRegistration" + userId); //cannot be called inside options call below...
+    var salutation= x.options[x.selectedIndex].text;
+  
+     user = {
+      userId: userId,
+      salutation: salutation,
+      firstName: firstName,
+      lastName: lastName,
+      address: address,
+      postcode: postcode,
+      location: location,
+      email: email,
+      username: username,
+      password: password,
+      passwordConfirmed: passwordConfirmed,
+      active: active, 
+      admin: admin
+  }
+  
+  if(userDataValidation(user)==false) return;  //do not continue
+  console.log(user);
+  
+  $.ajax({
+    type: "POST",
+    url: "/Backend/api.php",
+    data: {
+        user: user,
+        callerRole: callerRole 
+    },
+    dataType: "html",
+    cache: false,
+    success: function (response) {
+  
+          console.log("Response from updateUser:");
+          console.log("AJAX:" . response);
+          
+         
+          //now updating the table and inserting into the prepared DIV
+         
+            var btn=document.getElementById("dismissbtn"+callerID);
+            btn.click();
+          
+          getUserData2("#dynComponentDiv");
+       
+          //To-DO: innerHTML call update and open this users modal?  
+          //alternatively: open adminUser or UserService depending on calling page...
+          //window.location.href = "../sites/index.php";
+      },
+      error: function () {
+        console.log("AJAX:" + response);
+        console.log("AJAX:" + "Error response in updateUser:");
+      }
+  });
+  }
+  
+  function userDataValidation(user){
+    // Client validation
+    if (user.salutation == null || user.firstName == "" || user.lastName == "" || user.address == "" || user.postcode == "" || user.location == "" || user.email == "" || user.username == "" || user.password == "" || user.passwordConfirmed == "" || user.paymentMethodDetail == "" ||user.paymentMethodNum<=0 ) {
+      console.log("Client validation failed!");
+      $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
+      // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+      return false;
+    }
+    
+    if (user.password != null && user.password != user.passwordConfirmed) {
+      console.log("Password and passwordConfirmed stimmen nicht überein!");
+      $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Passwörter stimmen nicht überein!</p>");
+      // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+      return false;
+    }
+    }
+    function deleteUser(callerID){
+        console.log("starting deleteUser function()");
+        var userId=callerID;
+        //var userId = $("#affected_userID").val(); //hidden tag with userId on page.changed to parameter
+        $.ajax({
+          type: "GET",
+          url: "../../Backend/api.php",
+          data: {
+              deleteId: userId,
+          },
+          dataType: "html",
+          cache: false,
+          success: function (response) {
+      
+              console.log("Response from deleteUser:");
+              //console.log(response);
+              alert(response);
+              //To-DO: innerHTML call update and open this users modal?  
+              //alternatively: open adminUser or UserService depending on calling page...
+              //window.location.href = "../sites/index.php";
+              var btn=document.getElementById("dismissbtn"+callerID);
+                btn.click();
+              
+              getUserData2("#dynComponentDiv");
+      
+          },
+          error: function () {
+            console.log("Error in deleteUser JS");
+          }
+      });
+        
+      }
 
 
 

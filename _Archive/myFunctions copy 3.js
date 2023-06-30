@@ -514,7 +514,7 @@ function saveEditedUserData() {
         // TO DO Funktion regsiterUser anpassen
 
     }   
-    
+}
 
     
         

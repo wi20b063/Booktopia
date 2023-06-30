@@ -6,7 +6,11 @@
    $db = "bookstopia";
    $tbl_user = "user";
    $tbl_book = "book";
-
+   $tbl_voucher = "voucher";
+   $tbl_order = "orders";
+   $tbl_order_details = "order_details";
+   $tbl_payment_items="paymentitems";
+   
     // Create connection
    $con = new mysqli($dbhost, $dbuser, $dbpassword, $db);
 

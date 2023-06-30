@@ -21,7 +21,7 @@
     integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
 
 <!-- Local JavaScripts -->
-<script src="../js/myFunctions.js"></script>
+<script src="/Frontend/js/myFunctions.js"></script>
 
 <!-- CDN for crypto-js for password hashing with sha512-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"

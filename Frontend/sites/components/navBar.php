@@ -23,15 +23,27 @@
             <li class="nav-item" id="navRegister">
                 <a class="nav-link" href="../sites/registration.php">Registrierung</a>
             </li>
-            <li class="nav-item" id="navManageProducts">
+            
+            <li class="nav-item dropdown" id="navAdminDropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarAdminDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Admin Bereich</a>
+                <ul class="dropdown-menu dropdown-menu-end" id="navbar-dropdown-menu" aria-labelledby="navbarAdminDropdown">
+                    <li><a class="dropdown-item" id="navProductAdm" href=" ../sites/order_admin.php">Bestellungen verwalten</a></li>
+                    <li><a class="dropdown-item" href="../sites/user_admin.php">Benutzer verwalten</a></li>
+                    <li><a class="dropdown-item" href="../sites/product_admin.php">Produkte verwalten</a></li>
+                    <li><a class="dropdown-item" href="../sites/voucher_admin.php">Gutscheine verwalten</a></li>
+
+                </ul>
+            </li>
+<!--             <li class="nav-item" id="navManageProducts">
                 <a class="nav-link" href="#">Produkte verwalten</a>
             </li>
             <li class="nav-item" id="navManageCustomers">
-                <a class="nav-link" href="#">Kunden verwalten</a>
+                <a class="nav-link" href="../sites/user_admin.php">Kunden verwalten</a>
             </li>
             <li class="nav-item" id="navManageVouchers">
                 <a class="nav-link" href="#">Gutscheine verwalten</a>
-            </li>
+            </li> -->
             <!-- <li class="nav-item">
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
             </li> -->

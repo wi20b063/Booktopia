@@ -10,7 +10,9 @@ class UserService {
     // get data from MySQL database with SQL statements
     private $con;
     private $tbl_user;
+    private $userID;
 
+    private User $user;
     public function __construct($con, $tbl_user) {
         $this->con = $con;
         $this->tbl_user = $tbl_user;
@@ -33,7 +35,9 @@ class UserService {
         $email = $user['email'];
         $username = $user['username'];
         $password = $user['password'];
-        // $creditCard = $user['creditCard'];
+        $paymentMethodDetail=$user["paymentType"]["payMethodDetail"];
+        $paymentMethod=$user["paymentType"]["paymentMethodNum"];
+        $paymentUserId=0;
         $active = 1;
         $admin = 0;    
 
@@ -58,7 +62,12 @@ class UserService {
             $result = mysqli_stmt_affected_rows($stmt);
             
             if ($result == 1) {
-                // user created
+                // user created. now adding payment info
+                $last_id = mysqli_stmt_insert_id($stmt) ;
+                if(!is_null($paymentMethodDetail) && !is_null($paymentMethod)){
+                    $result = $this->addNewPaymentMethod($last_id,$paymentMethod, $paymentMethodDetail );
+                }
+                
                 header("Refresh:0; url=../index.php");
             } else {
                 // error - user not created
@@ -67,6 +76,53 @@ class UserService {
         }
     }
     
+    // ************************************************************
+    //          Add, Remove payment info of User + utilities
+    // ************************************************************
+
+     //adds the payment option of a user to DB 
+     public function addNewPaymentMethod($userId,  $paymentMethodId, $paymentMethodDetails){
+        // create payment method, find out paymentItemNr (if user has one already)and then update database
+        $userPaymentItemId=$this->getNewPaymentMethodID($this->userID);
+        $intPaymentMethodId=(int)$paymentMethodId;
+        
+        $sqlIns = "INSERT INTO paymentitems (userId, userPayMethodId, paymentMethod, payMethodDetail) VALUES (?,?,?,?)";
+            $stmt = $this->con->prepare($sqlIns);
+            $stmt->bind_param("iiis", $userId, $userPaymentItemId, $intPaymentMethodId, $paymentMethodDetails);
+            $stmt->execute();
+            $result = mysqli_stmt_affected_rows($stmt);
+            if ($result == 1) {
+                // paymentMethod added
+                echo " Paymentmethod added";
+            } else {
+                // error - paymentMethod not created
+                echo " ERROR - Payment Method not created";
+            }
+            return($result);
+    }
+     //returns the next  paymment option number of user
+     public function getNewPaymentMethodID($userID){
+        $index=0;
+        $sql = "Select Max(userPayMethodId) from paymentItems WHERE userId = ?";
+        $query = $this->con->prepare($sql);
+        $query->bind_param("s", $this->userID);
+        $query->execute();
+        $query->bind_result($index);
+        $query->fetch();
+        return $index+1;
+    }
+//returns all payment options of  user
+    public function getUserPayMethods($userID){
+        $sql = "Select * from paymentItems WHERE userId = ?";
+        $query = $this->con->prepare($sql);
+        $query->bind_param("s", $this->userID);
+        $query->execute();
+        $result= $query->get_result();
+        while($resSet = mysqli_fetch_assoc($result)){
+            $userPayMethods[$i++]= new PaymenMetType($resSet['userId'], $resSet['userPayMethodId'],$resSet['paymentMethod'],$resSet['payMethodDetails']);
+        }
+        return $userPayMethods;
+    }
     
 
     // ************************************************************
