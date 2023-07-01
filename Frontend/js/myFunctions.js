@@ -699,7 +699,9 @@ function createInvoice(invoiceForOrderNo) {
     var totalPrice = 0;
 
    var clickedOrderId = parseInt(invoiceForOrderNo.match(/\d+/)[0]);
-   console.log("clickedOrderId: " + clickedOrderId);
+   console.log("clickedOrderId in function createInvoice: " + clickedOrderId);
+   console.log(" 2 createInvoice() reached in myFunctions.js");
+
 
     // add customer data to invoice
     var customerData = getUserData();
@@ -710,8 +712,9 @@ function createInvoice(invoiceForOrderNo) {
     var customerPostcode = customerData['postcode'];
     var customerLocation = customerData['location'];
     var customerId = customerData['userid'];
+    console.log("3 createInvoice() reached in myFunctions.js");
 
-    console.log("customerSalutation: " + customerSalutation);
+    console.log("customerSalutation in function createInvoice: " + customerSalutation);
 
     // create invoice customer data
     $("#invoiceCustomerSalutation").text(customerSalutation);
@@ -758,15 +761,13 @@ function createInvoice(invoiceForOrderNo) {
         // get book details for every order position
         var bookDetails = getBookDetails(orderDetailsArticleId);
 
-        console.log("bookDetails: " + bookDetails);
-
         var bookDetailsIsbn = bookDetails[0]['isbn'];
         var bookDetailsTitle = bookDetails[0]['titel'];
         var bookDetailsAutor = bookDetails[0]['autor'];
         var bookDetailsPrice = bookDetails[0]['preis'];
         var totalPerPos = orderDetailsArticleQuantity * bookDetailsPrice;
 
-        console.log("bookDetailsIsbn: " + bookDetails[0]['isbn']);
+        console.log("bookDetailsIsbn in function createInvoice: " + bookDetails[0]['isbn']);
 
         appendOrderDetails = appendOrderDetails + "<tr><td>" + pos + "</td><td>" + bookDetailsIsbn + "</td><td>" + bookDetailsTitle + "</td><td>" + bookDetailsAutor + "</td><td>" + bookDetailsPrice + " EUR</td><td>" + orderDetailsArticleQuantity + "</td><td class='totalPricePerPosition'>" + totalPerPos + " EUR</td></tr>";
 

@@ -66,7 +66,8 @@
                     aria-expanded="false">Mein Konto</a>
                 <ul class="dropdown-menu dropdown-menu-end" id="navbar-dropdown-menu" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" id="navProfile" href=" ../sites/profile.php">Profil</a></li>
-                    <li><a class="dropdown-item" href="../sites/orderOverviewCustomer.php">Bestellungen</a></li>
+                    <li><a class="dropdown-item" id="navOrders"
+                            href="../sites/orderOverviewCustomer.php">Bestellungen</a></li>
                     <!-- <li><a class="dropdown-item" href="../sites/invoiceOverviewCustomer.php">Rechnungen</a></li> -->
                 </ul>
             </li>
