@@ -47,7 +47,7 @@ class UserService {
                 
         if ($result->num_rows > 0) {
             // User already exists
-            echo " User exists";
+            echo "User exists";
             
         } else {
             // add user with prepared statement         

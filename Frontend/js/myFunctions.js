@@ -154,7 +154,30 @@ function registerUser() {
         return;
     }
 
-    // !!!! noch offen E-Mail Prüfung / password Regex / creditCard Regex
+    // Client - Email validation
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        console.log("Invalid email format!");
+        $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Ungültige E-Mail-Adresse!</p>");
+        // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+        return;
+    }
+
+    // Client - Password validation
+    if (password.length < 8) {
+        console.log("Password is too short!");
+        $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Das Passwort muss mindestens 8 Zeichen lang sein!</p>");
+        // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+        return;
+    }
+
+    var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    if (!passwordRegex.test(password)) {
+        console.log("Password is invalid!");
+        $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten!</p>");
+        // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+        return;
+    }
 
     if (password != passwordConfirmed) {
         console.log("Password and passwordConfirmed stimmen nicht überein!");
@@ -193,8 +216,14 @@ function registerUser() {
 
             console.log("Response from registerUser():");
             console.log(response);
+            if(response == "User exists") {
+                alert('Der Benutzername ist bereits vergeben, bitte wählen Sie einen anderen.');
+                window.location.href = "../sites/index.php";
+            }else{
+
             alert('Sie wurden erfolgreich registriert, bitte loggen Sie sich ein, um fortzufahren.');
             window.location.href = "../sites/index.php";
+        }
 
         },
         error: function () {
