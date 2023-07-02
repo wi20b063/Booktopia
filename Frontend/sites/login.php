@@ -74,7 +74,7 @@
 
     </main>
 
-    <footer class=" py-3 my-4 fixed-bottom">
+    <footer class="py-3 my-4">
         <?php include "components/footer.php";?>
     </footer>
 

@@ -4,8 +4,6 @@
 
 <head>
 
-<script src="../../Frontend/js/myFunctions.js"></script>
-
 < <script>
     $(document).ready(function() {
         // Laden Sie die Warenkorb-Anzahl aus der Session-Variablen und aktualisieren Sie die Anzeige

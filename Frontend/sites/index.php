@@ -5,6 +5,7 @@
 <head>
 
     <?php include "components/head.php";?>
+    <?php include "../../Backend/logic/sessionShoppingCart.php";?>
 
     <title>Booktopia</title>
 
@@ -29,7 +30,7 @@
 
     </main>
 
-    <footer class="py-3 my-4 fixed-bottom">
+    <footer class="py-3 my-4">
         <?php include "components/footer.php";?>
     </footer>
 

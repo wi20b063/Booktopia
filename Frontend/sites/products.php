@@ -8,8 +8,6 @@
 
     <title>Produkte</title>
 
-    <script src="../../Frontend/js/myFunctions.js"></script>
-
     <script>
       $(document).ready(function() {
           // Kategorieauswahl überwachen und Produkte laden
