@@ -22,9 +22,11 @@
             <div class="container">
                 <h1 class="headline">Willkommen bei Bookstopia!</h1>
                 <p><strong>Der einzigartige Online Buchshop.</strong></p>
-                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque blanditiis similique qui
-                    facilis, harum alias. Sunt et, soluta ipsa voluptatem tempora possimus magnam numquam magni, debitis
-                    sapiente reprehenderit molestias aperiam.</p>
+                <p>Unser Online Buchshop ist ein Ort, der die Leidenschaft für Bücher und das Lesen in die digitale Welt überträgt. Wir streben danach, die beste und vielfältigste Auswahl an Büchern anzubieten und gleichzeitig ein inspirierendes und benutzerfreundliches Einkaufserlebnis zu schaffen.</p>
+                <p>Unser Shop ist intuitiv gestaltet, mit einer klaren und übersichtlichen Benutzeroberfläche, die es unseren Kunden einfach macht, ihre Lieblingsbücher zu finden. So können Sie neue Bücher entdecken, die Sie lieben werden.</p>
+                <br>
+                <br>
+                <img src="../res/img/logo-bookstopia.png" alt="Logo Bookstopia" class="centered-image" width="300" height="200">
             </div>
         </div>
 
