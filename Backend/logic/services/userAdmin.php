@@ -1,8 +1,8 @@
 <?php
-$path = $_SERVER['DOCUMENT_ROOT'];
+/* $path = $_SERVER['DOCUMENT_ROOT'];
 require_once ($path . '/backend/logic/session.php');
 require_once ($path . '/Backend/logic/services/userService.php');
-require_once ($path . '/backend/models/paymentType.php');
+require_once ($path . '/backend/models/paymentType.php'); */
 
 
 class adminUser {

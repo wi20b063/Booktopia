@@ -8,7 +8,21 @@
 // api.php executes tasks from frontend and calls the needed services
 
 // include necessary files
-$path = $_SERVER['DOCUMENT_ROOT'];
+require (dirname(__FILE__) . "\config\dbaccess.php"); //??
+require (dirname(__FILE__) . "\models\user.php");
+require (dirname(__FILE__) . "\logic\services\userService.php");
+require (dirname(__FILE__) . "\models\book.php");
+require (dirname(__FILE__) . "\logic\services\bookService.php");
+require (dirname(__FILE__) . "\logic\services\userAdmin.php");
+require (dirname(__FILE__) . "\logic\services\orderService.php");
+require (dirname(__FILE__) . "\logic\session.php");
+require (dirname(__FILE__) . "\models\paymentType.php");
+require (dirname(__FILE__) . "\models\orderItem.php");
+require (dirname(__FILE__) . "\models\order.php");
+
+
+
+/* $path = $_SERVER['DOCUMENT_ROOT'];
 require_once ($path . '\Backend\config\dbaccess.php');
 require_once ($path. '/Backend/models/user.php');
 require_once ($path . '/Backend/logic/services/userService.php');
@@ -16,7 +30,7 @@ require_once ($path . '/Backend/models/book.php');
 require_once ($path . '/Backend/logic\services\bookService.php');
 require_once ($path . '/Backend/logic\services\userAdmin.php');
 require_once ($path . '/Backend/logic\services\orderService.php');
-require_once ($path . '/Backend/logic\session.php');
+require_once ($path . '/Backend/logic\session.php'); */
 
 
 // an instance of the API class is created

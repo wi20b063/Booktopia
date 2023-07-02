@@ -1,9 +1,9 @@
 <?php
-$path = $_SERVER['DOCUMENT_ROOT'];
+/* $path = $_SERVER['DOCUMENT_ROOT'];
 require_once ($path .'/backend/logic/session.php');
 require_once($path . '/backend/models/order.php');
 require_once($path . '/backend/models/book.php');
-require_once($path . '/backend/models/orderItem.php');
+require_once($path . '/backend/models/orderItem.php'); */
 global $tbl_book;
 
  class OrderService {
@@ -191,4 +191,3 @@ global $tbl_book;
 }
 
 ?>
-
