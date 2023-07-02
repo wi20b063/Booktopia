@@ -811,3 +811,113 @@ function hashPasswordWithSHA512(password) {
     var hashedPassword = CryptoJS.SHA512(password).toString();
     return hashedPassword;
 }
+
+
+// ************************************************************
+//          Denise
+// ************************************************************
+
+
+// Funktion zum Laden der Produkte basierend auf der ausgewählten Kategorie
+function loadProducts(category) {
+    $.ajax({
+      url: '../../Backend/logic/server.php',
+      type: 'GET',
+      data: { category: category },
+      dataType: 'json',
+      success: function(response) {
+        // Kategorienamen aktualisieren
+        $('#category-name').text(response.category);
+
+        // Produkte auf der Seite anzeigen
+        var productsContainer = $('#products-container');
+        productsContainer.empty();
+        response.products.forEach(function(product) {
+          var html = '<div class="product">' +
+                     '<h3>' + product.titel + '</h3>';
+
+          // Überprüfen, ob eine Bild-URL vorhanden ist
+          if (product.image_url) {
+            html += '<img src="' + product.image_url + '" alt="' + product.titel + '">';
+          }
+
+          html += '<p>Preis: ' + product.preis + '€' + '</p>';
+
+          if (product.bewertung === 0) {
+            html += '<p>Bewertung: Keine Bewertung</p>';
+          } else {
+            html += '<p>Bewertung: ' + product.bewertung + '</p>';
+          }
+
+          html += '</div>';
+          html += '<button type="button" class="btn btn-secondary add-to-cart" data-product-id="' + product.id + '">In den Warenkorb</button>';
+
+          html += '<hr>';
+
+          html += '<br><br>';
+
+          productsContainer.append(html);
+        });
+
+        // Auf den Klick des "In den Warenkorb" Buttons reagieren
+        $('.add-to-cart').click(function() {
+          var productId = $(this).data('product-id');
+          addToCart(productId);
+        });
+      }
+    });
+  }
+
+  // Funktion zum Hinzufügen des ausgewählten Produkts in den Warenkorb
+function addToCart(productId) {
+    $.ajax({
+      url: '../../Backend/logic/services/addToCart.php',
+      type: 'POST',
+      data: { product_id: productId },
+      success: function(response) {
+    // Die Antwort enthält die Anzahl der Produkte im Warenkorb
+    var count = parseInt(response);
+    // Aktualisieren Sie die Anzeige der Warenkorb-Anzahl 
+    $('#cart-count').text(count);
+    
+    // Speichern Sie den aktuellen Stand der Warenkorb-Anzahl in einer Session-Variablen
+    $.ajax({
+      url: '../../Backend/logic/services/save_cart_count.php', // Pfad zum serverseitigen Skript zum Speichern der Warenkorb-Anzahl
+      type: 'POST',
+      data: { cart_count: count },
+      success: function(response) {
+        // Erfolgsbehandlung
+      },
+      error: function(xhr, status, error) {
+        // Fehlerbehandlung
+      }
+    });
+  }
+    });
+  
+  }
+
+
+  function searchNav(query) {
+  // Make an AJAX request to the server
+  $.ajax({
+    url: '../../Backend/logic/search.php', // Replace with the correct path to your server-side search script
+    type: 'POST',
+    data: { query: query },
+    dataType: 'json',
+    success: function(response) {
+      // Clear previous search results
+      $('#search-results').empty();
+
+      // Iterate through the response and display the results
+      for (var i = 0; i < response.length; i++) {
+        var result = response[i];
+        console.log(result);
+        $('#search-results').append('<div>' + result.titel + '</div>');
+      }
+    },
+    error: function() {
+      console.log('Error occurred during search');
+    }
+  });
+}

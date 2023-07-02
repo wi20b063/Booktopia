@@ -1,3 +1,29 @@
+<!DOCTYPE html>
+
+<html lang="EN">
+
+<head>
+
+<script src="../../Frontend/js/myFunctions.js"></script>
+
+< <script>
+    $(document).ready(function() {
+        // Laden Sie die Warenkorb-Anzahl aus der Session-Variablen und aktualisieren Sie die Anzeige
+        var cartCount = <?php echo isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0; ?>;
+        $('#cart-count').text(cartCount);
+
+        // Bind an event listener to the search input
+        $('#search-input').on('input', function() {
+        var query = $(this).val(); // Get the search query
+
+        searchNav(query); // Call the searchNav function with the query
+      });
+
+    });
+</script>
+</head>
+<body>
+
 <div class="container-fluid">
     <a class="navbar-brand " href="index.php">
         <img id="logo-nav" src="../res/img/logo-bookstopia.png" alt="Logo Bookstopia">
@@ -15,7 +41,7 @@
                 <a class="nav-link active" aria-current="page" href="index.php">Home</a>
             </li>
             <li class="nav-item" id="navProducts">
-                <a class="nav-link" href="#">Produkte</a>
+                <a class="nav-link" href="../sites/products.php">Produkte</a>
             </li>
             <li class="nav-item" id="navAboutUs">
                 <a class="nav-link" href="#">Über uns</a>
@@ -40,11 +66,16 @@
 
         <ul class="nav navbar-nav navbar-right">
             <form class="d-flex" role="search" id="navSearch">
-                <input class=" form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <input class=" form-control me-2" type="text" id="search-input" placeholder="Produktsuche" aria-label="Search">
+            </form>
+            <form class="d-flex" role="search" id="navSearch">
+                <div id="search-results"></div>
             </form>
             <li class="nav-item" id="navShoppingCart">
-                <a class="nav-link" href="#">Warenkorb</a>
+                <a class="nav-link" href="../sites/shoppingCart.php"><img src="../res/img/cart.png" weight="30" height = "30"></a>
+            </li>
+            <li class="nav-item" id="navShoppingCart">
+                <span class="badge bg-danger" id="cart-count">0</span>
             </li>
             <!-- <li class="nav-item" id="navProfile">
                 <a class="nav-link" href="#">Mein Konto</a>
@@ -70,3 +101,6 @@
 </div>
 </div>
 </div>
+</body>
+
+</html>

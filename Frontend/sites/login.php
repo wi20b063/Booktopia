@@ -5,6 +5,8 @@
 <head>
 
     <?php include "components/head.php";?>
+    <?php include "../../Backend/logic/sessionShoppingCart.php";?>
+
 
     <title>Booktopia | Login</title>
 
