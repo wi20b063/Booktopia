@@ -41,9 +41,6 @@
             <li class="nav-item" id="navProducts">
                 <a class="nav-link" href="../sites/products.php">Produkte</a>
             </li>
-            <li class="nav-item" id="navAboutUs">
-                <a class="nav-link" href="#">Über uns</a>
-            </li>
             <li class="nav-item" id="navRegister">
                 <a class="nav-link" href="../sites/registration.php">Registrierung</a>
             </li>

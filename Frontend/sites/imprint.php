@@ -13,10 +13,6 @@
 
 <body>
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-        <?php include "components/navGuest.php";?>
-    </nav>
-
     <main>
         <div class="content">
             <div class="container" style="text-align: center">
