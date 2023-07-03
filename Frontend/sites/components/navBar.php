@@ -46,13 +46,13 @@
                     <a class="nav-link" href="../sites/registration.php">Registrierung</a>
                 </li>
                 <li class="nav-item" id="navManageProducts">
-                    <a class="nav-link" href="#">Produkte verwalten</a>
+                    <a class="nav-link" href="../sites/productAdm.php">Produkte verwalten</a>
                 </li>
                 <li class="nav-item" id="navManageCustomers">
-                    <a class="nav-link" href="#">Kunden verwalten</a>
+                    <a class="nav-link" href="../sites/userAdm.php">Kunden verwalten</a>
                 </li>
                 <li class="nav-item" id="navManageVouchers">
-                    <a class="nav-link" href="#">Gutscheine verwalten</a>
+                    <a class="nav-link" href="../sites/orderAdm.php">Bestellungen verwalten</a>
                 </li>
                 <!-- <li class="nav-item">
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>

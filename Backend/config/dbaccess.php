@@ -1,12 +1,18 @@
 <?php
    
+   $path = $_SERVER['DOCUMENT_ROOT'];
    $dbhost = "localhost";
    $dbuser = "root";
    $dbpassword = ""; //derzeit noch kein Passwort gesetzt
    $db = "bookstopia";
    $tbl_user = "user";
    $tbl_book = "book";
-
+   $tbl_voucher = "voucher";
+   $tbl_order = "orders";
+   $tbl_order_details = "order_details";
+   $tbl_payment_items="paymentitems";
+   $img_path = "/Frontend/res/img/";
+   $img_path_thumb="/Frontend/res/img/thumb/";
     // Create connection
    $con = new mysqli($dbhost, $dbuser, $dbpassword, $db);
 

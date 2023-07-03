@@ -8,15 +8,17 @@
 // api.php executes tasks from frontend and calls the needed services
 
 // include necessary files
-require (dirname(__FILE__) . "\config\dbaccess.php"); //??
-require (dirname(__FILE__) . "\models\user.php");
-require (dirname(__FILE__) . "\logic\services\userService.php");
-require (dirname(__FILE__) . "\models\book.php");
-require (dirname(__FILE__) . "\logic\services\bookService.php");
-require (dirname(__FILE__) . "\logic\session.php");
+require_once (dirname(__FILE__) . "\config\dbaccess.php"); //??
+require_once (dirname(__FILE__) . "\models\user.php");
+require_once (dirname(__FILE__) . "\logic\services\userService.php");
+require_once (dirname(__FILE__) . "\models\book.php");
+require_once (dirname(__FILE__) . "\logic\services\bookService.php");
+require_once (dirname(__FILE__) . "\logic\session.php");
+require_once (dirname(__FILE__) . "\logic\services\userAdmin.php");
+require_once (dirname(__FILE__) . "\logic\services\orderService.php");
 
 // an instance of the API class is created
-$api = new Api($con, $tbl_user, $tbl_book);
+$api = new Api($con, $tbl_user, $tbl_book,$tbl_payment_items, $tbl_order, $tbl_order_details);
 
 // call processRequest for working on requests
 $api->processRequest();
@@ -25,12 +27,19 @@ class Api {
     // constructor
     private $userService;
     private $bookService;
+    private $admin_manageBooks;
+    private $admin_manageUsers;
+    private $admin_manageOrders;
+    private $admin_manageVouchers;
+    private $orderService;
 
     // is called when a new instance of the service calsses is created
-    public function __construct($con, $tbl_user, $tbl_book) {
-        // create instances of the services
+    public function __construct($con, $tbl_user, $tbl_book, $tbl_payment_items, $tbl_order, $tbl_order_details) {
+     // create instances of the services
         $this->userService = new UserService($con, $tbl_user);
         $this->bookService = new BookService($con, $tbl_book);
+        $this->admin_manageUsers = new adminUser($con, $tbl_user, $tbl_payment_items);
+        $this->orderService = new OrderService($con, $tbl_order, $tbl_book, $tbl_order_details, $tbl_user,  $tbl_payment_items);
     }
 
     
@@ -55,7 +64,7 @@ class Api {
                     break;
     
                 default:
-                    $this->error(405, ["Allow: GET, POST, DELETE"], "Method not allowed");                
+                    $this->error(405,  "Method not allowed");                
             }
     }
 
@@ -130,7 +139,27 @@ class Api {
                 } else {
                     $this -> error(401, $result);                
                 }
-        
+            } 
+            elseif (isset($_GET['deleteId']) ) {
+                // echo " processGet - getUserData - in api.php reached";
+                
+                $UdeleteDetails= $this->admin_manageUsers->deleteUser($_GET["deleteId"]);
+                $this->success(200, "Erfolgreich gelöscht".$UdeleteDetails, []);
+                
+            } // get User's order data
+            elseif (isset($_GET['userOrder']) ) {
+                //echo " processGet - getUserData - in api.php reached";
+                $this->orderService->fetchUserOrders($_GET["userOrder"]);
+    
+            } // get User's order data
+            elseif (isset($_GET['allOrders']) ) {
+                //echo " processGet - getUserData - in api.php reached";
+                $this->orderService->fetchAllOrders();
+            } // get Book Product
+            elseif (isset($_GET['deleteBook']) ) {
+                //echo " processGet - getUserData - in api.php reached";
+                $BdeleteDetails= $this->bookService->deleteBook($_GET["bookId"]);
+                $this->success(200, "Erfolgreich gelöscht".$BdeleteDetails, []);
         
         /* } elseif (isset($_GET["book"])) {
             // Produkt erstellen
@@ -139,7 +168,7 @@ class Api {
             $books = $this->bookService->findAll();
             $this->success(200, $books); */
         } else { 
-            $this->error(400, [], "GET: Bad Request - invalid parameters " . http_build_query($_GET));
+            $this->error(400,  "GET: Bad Request - invalid parameters " . http_build_query($_GET));
         }
     }
 
@@ -155,7 +184,15 @@ class Api {
             // Error
             echo "Empty post request.";
         }
-        
+        elseif (isset($_POST["user"]) && isset($_POST["callerRole"])) { 
+            // User exists, updatem
+            echo "console.log('processPost - saveUser - in api.php reached');";
+            // fetch data from posted body
+            $user = $_POST["user"];
+            // print firstname of array user
+            echo $user["username"];
+            $this->admin_manageUsers->updateUser($user,$_POST["callerRole"]);
+        }
         // register user
         elseif (isset($_POST["user"])) { 
             $user = $_POST["user"];
@@ -165,9 +202,26 @@ class Api {
         } elseif (isset($_POST["saveEditedUserData"])) {             
             $editedUser = $_POST["editedUser"];
             $this->userService->saveEditedUserData($editedUser);
+            // update BOOK-Product
+        } elseif(isset($_POST["updateBook"]) && isset($_POST["imgChanged"])){
+            $temp=$_POST["updateBook"]["bookId"];
+            if($temp>0){// update existing book
+                
+                if($_POST["imgChanged"]==true){
+                    //file upload
+                    $fileupL=true;
+                }
+
+                $updateBook=$this->bookService->updateBook($_POST["updateBook"]);
+            }  
+            else //new book
+            {
+                $updateBook=$this->bookService->addBook($_POST["updateBook"]);
+            }
+            // image upload and update...
                     
         } else {
-            $this->error(400, "POST: Bad Request - invalide Parameter" . http_build_query($_GET), []);
+            $this->error(400, "POST: Bad Request - invalide Parameter" . http_build_query($_GET));
         }
     }
 

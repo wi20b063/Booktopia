@@ -1,6 +1,6 @@
     <?php
 // Verbindung zur Datenbank herstellen
-require (dirname(__FILE__,2) . "\config\dbaccess.php");
+require_once (dirname(__FILE__,2) . "\config\dbaccess.php");
 
 
 // Funktion zum Abrufen der Produkte basierend auf der ausgewählten Kategorie

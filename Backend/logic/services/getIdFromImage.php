@@ -1,6 +1,6 @@
 <?php
 // Verbindung zur Datenbank herstellen (Beispiel)
-require (dirname(__FILE__, 3) . "/config/dbaccess.php");
+require_once (dirname(__FILE__, 3) . "/config/dbaccess.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Bild-URL aus der POST-Anfrage abrufen und decodieren

@@ -33,7 +33,7 @@ class Book {
 
 
     public function __construct(int $bookId, string $title, string $author,
-                                string $rating, string $isbn,
+                                int $rating, string $isbn,
                                  string $genre, string $language, int $price,
                                 string $description, string $image, int $stock) { 
         $this->bookId         = $bookId;
@@ -61,17 +61,12 @@ class Book {
         return $this->author;
     }
 
-    public function getPublisher() {
-        return $this->publisher;
-    }
+
 
     public function getIsbn() {
         return $this->isbn;
     }
 
-    public function getYear() {
-        return $this->year;
-    }
 
     public function getGenre() {
         return $this->genre;
@@ -96,5 +91,10 @@ class Book {
     public function getStock() {
         return $this->stock;
     }    
+
+    public function getRating(){
+        return $this->rating;
+        }
+    
 
 }

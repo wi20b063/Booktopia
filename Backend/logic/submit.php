@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require (dirname(__FILE__,2) . "\config\dbaccess.php");
+require_once (dirname(__FILE__,2) . "\config\dbaccess.php");
 
 $salutation = $_POST['salutation'];
 $firstName = $_POST['firstName'];

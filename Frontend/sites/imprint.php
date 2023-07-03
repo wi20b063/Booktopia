@@ -4,8 +4,8 @@
 
 <head>
 
-    <?php include "components/head.php";?>
-    <?php include "../../Backend/logic/sessionShoppingCart.php";?>
+    <?php include_once "components/head.php";?>
+    <?php include_once "../../Backend/logic/sessionShoppingCart.php";?>
 
     <title>Booktopia | Imprint</title>
 

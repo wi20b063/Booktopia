@@ -116,18 +116,103 @@ class BookService {
     }
 
     
+ // ************************************************************
+    //          BOOK Admin and utility functions
+    // ************************************************************  
+
+    public function arr2Book($myBook){
+        
+        $myBook2=new Book($myBook["bookId"],$myBook["title"],$myBook["author"],$myBook["rating"],$myBook["isbn"],$myBook["genre"],$myBook["language"],$myBook["price"],$myBook["descr"],$myBook["image"],$myBook["stock"] );
+        return($myBook2);
+
+    }
+
+    public function addBook($book)
+	{	if($_SESSION["admin"]==1){
+			
+			$insertQuery = "INSERT INTO book (titel, autor, isbn,  kategorie, language, preis, description, image_url, stock)
+							VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$stmt = mysqli_prepare($this->con, $insertQuery);
+			mysqli_stmt_bind_param($stmt, "sssssissi", $book["title"], $book["author"],  $book["isbn"],  $book["genre"], $book["language"], $book["price"], $book["desc"], $book["image"], $book["stock"]);
+			$insertResult = mysqli_stmt_execute($stmt);
+
+			if ($insertResult) {
+				echo "Buch wurde erfolgreich hinzugefügt!";
+			} else {
+				echo "Fehler beim Hinzufügen des Buches: " . mysqli_error($this->con);
+			}
+			return ($insertResult);
+		}
+			else return 0;
+		} 
+	
+
+	public function deleteBook($bookId)
+	{
+		if($_SESSION["admin"]==1){
+		
+			$deleteQuery = "DELETE FROM book WHERE id = ?";
+			$stmt = mysqli_prepare($this->con, $deleteQuery);
+			mysqli_stmt_bind_param($stmt, "i", $bookId);
+			$deleteResult = mysqli_stmt_execute($stmt);
+
+			if ($deleteResult) {
+				echo "Buch wurde erfolgreich gelöscht!";
+			} else {
+				echo "Fehler beim Löschen des Buches: " . mysqli_error($this->con);
+			}
+			return($deleteResult);
+		}		
+	}
+
+
+	public function updateBook( $book)
+	{ 
+		if($_SESSION["admin"]==1) {
+			// Update the book record in the database
+			$updateQuery = "UPDATE book SET titel = ?, autor = ?,  isbn = ?,  kategorie = ?, language = ?, preis = ?, description = ?, image_url = ?, stock = ? WHERE id = ?";
+			$stmt = mysqli_prepare($this->con, $updateQuery);
+			mysqli_stmt_bind_param($stmt, "sssssissii", $book["title"] , $book["author"],  $book["isbn"], $book["genre"],  $book["language"], $book["price"], $book["description"], $book["image"], $book["stock"], $book["bookId"]);
+			$updateResult = mysqli_stmt_execute($stmt);
+
+			if ($updateResult) {
+				echo "Buch wurde erfolgreich aktualisiert!";
+			} else {
+				echo "Fehler beim Aktualisieren des Buches: " . mysqli_error($this->con);
+			}
+            return $updateResult;
+		} return false;
+	}
+
+    public function fetchAllBooks(){
+
+        if($_SESSION["admin"]==1){
+            $bookItems = [];
+            $sql = "SELECT * FROM book";
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $i=0;
+        while ($resSet=mysqli_fetch_assoc($result)){
+            //creat one object each from the row  fetched and add  to the array of the Book object
+            $bookItems[$i++]= new Book($resSet['id'],$resSet['titel'],$resSet['autor'],$resSet['bewertung'],$resSet['isbn'],$resSet['kategorie'],$resSet['language'], $resSet['preis'],$resSet['description'],$resSet['image_url'], $resSet['stock']);
+        }
+        }
+        $stmt->close();
+        return($bookItems);
+    }
+
+	 
+public function fetchBook(int $bookId){ //0=all, other integer=bookId
+    if($bookId==0){
+        return $this->fetchAllBooks();
+    }   
+    else{
+        return $this->fetchBook($bookId);
+    }
+}
 
        
-    /* public function delete(User $user) {
-        
-        // Implementieren Sie den Code, um einen vorhandenen Benutzer aus der Datenquelle zu löschen
-        // Beispiel:
-        // Database::execute("DELETE FROM users WHERE id = ?", [$user->getId()]);
-        
-        return true;
-    } */
-
-    // Close connection
     public function closeConnection() {
         $this->con->close();
     }

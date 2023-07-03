@@ -4,8 +4,8 @@
 
 <head>
 
-    <?php include "components/head.php";?>
-    <?php include "../../Backend/logic/sessionShoppingCart.php";?>
+    <?php include_once "components/head.php";?>
+    <?php include_once "../../Backend/logic/sessionShoppingCart.php";?>
 
 
     <title>Booktopia | Login</title>
@@ -15,7 +15,7 @@
 <body>
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-        <?php include "components/navBar.php";?>
+        <?php include_once "components/navBar.php";?>
     </nav>
 
     <main>
@@ -75,7 +75,7 @@
     </main>
 
     <footer class="py-3 my-4">
-        <?php include "components/footer.php";?>
+        <?php include_once "components/footer.php";?>
     </footer>
 
 </body>

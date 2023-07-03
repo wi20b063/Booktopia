@@ -1,6 +1,6 @@
 <?php
 // Verbindung zur Datenbank herstellen (Beispiel)
-require (dirname(__FILE__,2) . "\config\dbaccess.php");
+require_once (dirname(__FILE__,2) . "\config\dbaccess.php");
 
 // Retrieve the search query from the AJAX request
 $query = $_POST['query'];

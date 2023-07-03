@@ -415,6 +415,36 @@ function getUserData() {
     return userData;
 }
 
+/* function getUserData3(targetDiv){
+    const parent = document.getElementById("dynComponentDiv");
+    $("#dynComponentDiv").load('../../Backend/logic/services/UserAdmView.php');
+  } */
+  function getUserData2(targetDiv){
+    var link='../../Backend/logic/services/UserAdmView.php';
+    $.ajax({
+        type:   "POST",
+        url:    link,
+        dataType: "html",
+        success:function(data) {
+            $("#dynComponentDiv").html(data);
+        }
+    });
+    return false;  // for good measure
+};
+
+function fetchAllOrders(targetDiv){
+    var link='../../Backend/logic/services/OrderAdminView.php';
+    $.ajax({
+        type:   "POST",
+        url:    link,
+        dataType: "html",
+        success:function(data) {
+            $("#dynComponentDivUsr").html(data);
+        }
+    });
+    return false;  // for good measure
+};
+
 
 // ************************************************************
 //          SAVE EDITED USER DATA
@@ -492,6 +522,144 @@ function saveEditedUserData() {
 
     
 }
+
+
+// ************************************************************
+//          USER-ADMIN routines (can reduce and combine with 
+//                  earlier functions if time permits)
+// ************************************************************
+
+function updateUser(callerID, callerRole){ //formID received to identify which form in modals was submitting the call
+    var callerRole;
+    var user, userId;
+    var password, passwordConfirmed, active, admin; 
+  
+    var userId = callerID; //hidden tag with userId on page
+    //var salutation= document.getElementById("salutationRegistration" + callerID).value; 
+    var firstName= document.getElementById("firstNameRegistration" + userId).value;
+    var lastName= document.getElementById(("lastNameRegistration" + userId)).value;
+    var address= document.getElementById("addressRegistration" + userId).value;
+    var postcode= document.getElementById("postcodeRegistration" + userId).value;
+    var location= document.getElementById("locationRegistration" + userId).value;
+    var email= document.getElementById("emailRegistration" + userId).value;
+    var username= document.getElementById("usernameRegistration" + userId).value;
+    if(callerRole==1){ //AdminRole
+       active= document.getElementById("flexSwitchCheckisActive"+ userId).checked==true ? 1 : 0;
+       admin= document.getElementById("flexSwitchCheckisAdmin" + userId).checked ? 1 : 0;
+    
+    } else
+    {//userRole
+       password = document.getElementById("passwordRegistration" + userId).value;
+       passwordConfirmed = document.getElementById("passwordConfirmedRegistration" + userId).value;
+    }
+  
+    var x = document.getElementById("salutationRegistration" + userId); //cannot be called inside options call below...
+    var salutation= x.options[x.selectedIndex].text;
+  
+     user = {
+      userId: userId,
+      salutation: salutation,
+      firstName: firstName,
+      lastName: lastName,
+      address: address,
+      postcode: postcode,
+      location: location,
+      email: email,
+      username: username,
+      password: password,
+      passwordConfirmed: passwordConfirmed,
+      active: active, 
+      admin: admin
+  }
+  
+  if(userDataValidation(user)==false) return;  //do not continue
+  console.log(user);
+  
+  $.ajax({
+    type: "POST",
+    url: "/Backend/api.php",
+    data: {
+        user: user,
+        callerRole: callerRole 
+    },
+    dataType: "html",
+    cache: false,
+    success: function (response) {
+  
+          console.log("Response from updateUser:");
+          console.log("AJAX:" . response);
+          
+         
+          //now updating the table and inserting into the prepared DIV
+         
+            var btn=document.getElementById("dismissbtn"+callerID);
+            btn.click();
+          
+          getUserData2("#dynComponentDiv");
+       
+          //To-DO: innerHTML call update and open this users modal?  
+          //alternatively: open adminUser or UserService depending on calling page...
+          //window.location.href = "../sites/index.php";
+      },
+      error: function () {
+        console.log("AJAX:" + response);
+        console.log("AJAX:" + "Error response in updateUser:");
+      }
+  });
+  }
+  
+  function userDataValidation(user){
+    // Client validation
+    if (user.salutation == null || user.firstName == "" || user.lastName == "" || user.address == "" || user.postcode == "" || user.location == "" || user.email == "" || user.username == "" || user.password == "" || user.passwordConfirmed == "" || user.paymentMethodDetail == "" ||user.paymentMethodNum<=0 ) {
+      console.log("Client validation failed!");
+      $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte alle Felder ausfüllen!</p>");
+      // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+      return false;
+    }
+    
+    if (user.password != null && user.password != user.passwordConfirmed) {
+      console.log("Password and passwordConfirmed stimmen nicht überein!");
+      $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Passwörter stimmen nicht überein!</p>");
+      // noch ein hide einfügen, damit Error Nachricht wieder verschwindet
+      return false;
+    }
+    }
+    function deleteUser(callerID){
+        console.log("starting deleteUser function()");
+        var userId=callerID;
+        //var userId = $("#affected_userID").val(); //hidden tag with userId on page.changed to parameter
+        $.ajax({
+          type: "GET",
+          url: "../../Backend/api.php",
+          data: {
+              deleteId: userId,
+          },
+          dataType: "html",
+          cache: false,
+          success: function (response) {
+      
+              console.log("Response from deleteUser:");
+              //console.log(response);
+              alert(response);
+              //To-DO: innerHTML call update and open this users modal?  
+              //alternatively: open adminUser or UserService depending on calling page...
+              //window.location.href = "../sites/index.php";
+              var btn=document.getElementById("dismissbtn"+callerID);
+                btn.click();
+              
+              getUserData2("#dynComponentDiv");
+      
+          },
+          error: function () {
+            console.log("Error in deleteUser JS");
+          }
+      });
+        
+      }
+
+      function IsNumeric(val) {
+        return Number(parseFloat(val)) === val;
+    }
 
 
 
@@ -970,4 +1138,197 @@ function dragAndDrop(image_url) {
             $('#cart-drop-target').append(productElement);
         }
     });
+    }
+
+    // ************************************************************
+//          BOOK-PRODUCT-ADMIN routines 
+// ************************************************************
+
+
+function deleteBookFromDB(bookId){
+
+    console.log("Deleting item " + bookId);
+    $.ajax({
+      type: "GET",
+      url: "/Backend/api.php",
+      data: {
+          deleteBook: bookId,
+      },
+      dataType: "json",
+      cache: false,
+      success: function (response) {
+    
+            console.log("Response from updateBook:");
+            console.log("AJAX:" + response);
+            //now updating the table and inserting into the prepared DIV
+
+              alert("Daten gelöscht")
+            //getUserData2("#dynComponentDivBook");
+            //window.location.href = "../sites/index.php";
+        },
+        error: function () {
+      
+          console.log("AJAX:" + "Error response in updateBook:");
+        }
+    });
+}
+
+function updateProductToDB(bookId) {
+
+    var title=  document.getElementById("bookTitleform" + bookId).value;
+    var author= document.getElementById("authorform" + bookId).value;
+    var rating= document.getElementById("ratingform" + bookId).value;
+    var isbn=   document.getElementById("isbnform" + bookId).value;
+    var genre=  document.getElementById("genreform" + bookId).value;
+    var language= document.getElementById("languageform" + bookId).value;
+    var price=    document.getElementById("priceform" + bookId).value;
+    var  descr=   document.getElementById("bookinfoform" + bookId).value;
+    var stock=    document.getElementById("stockform" + bookId).value;
+    var  image=   document.getElementById("imgpathformA" + bookId).value;
+    var bookId=    bookId
+   
+    book={
+    
+     title :    title,
+     author:    author,
+     rating:    rating,
+     isbn:      isbn,
+     genre:     genre,
+     language:  language,
+     price:     price,
+     descr:     descr,
+     stock:     stock,
+     image:     image,
+     bookId:    bookId
+}
+
+//validation
+if(document.getElementById("bookIdform"+bookId).checkValidity()== false){
+    
+}
+if (title == "" || author == "" || price=="" || stock=="" || rating=="" || (!Number.isInteger(parseInt(rating))) || (!Number.isInteger(parseInt(stock)))) {
+    console.log("Input validation failed!");
+    $("#errorRegistration").append("<p style='color:red; font-weight:bold;'>Bitte Plichtfelder (korrekt) ausfüllen!</p>");
+    alert("Eingabe nicht vollständig");
+    return;
+}
+  imgChanged= localStorage.getItem("isNewBookImage");
+  console.log("Entering api call with imgagechange=" + imgChanged + " for "  + book);
+  $.ajax({
+    type: "POST",
+    url: "/Backend/api.php",
+    data: {
+        updateBook: book,
+        imgChanged: imgChanged 
+    },
+    dataType: "json",
+    cache: false,
+    success: function (response) {
+  
+          console.log("Response from updateBook:");
+          console.log("AJAX:" + response);
+          
+         
+          //now updating the table and inserting into the prepared DIV
+         
+            alert("Daten gespeichert")
+          
+          //getUserData2("#dynComponentDivBook");
+       
+          //To-DO: innerHTML call update and open this users modal?  
+          //alternatively: open adminUser or UserService depending on calling page...
+          //window.location.href = "../sites/index.php";
+      },
+      error: function () {
+    
+        console.log("AJAX:" + "Error response in updateBook:");
+      }
+  });
+  }
+
+  
+// ************************************************************
+//          FILTERING PRODUCT and Categories ADMIN and SHOPPING
+// ************************************************************
+
+function filterUserTable( tableid, filterVal){
+ 
+    tag = document.getElementById("userListFilter1");
+    filterText= tag.options[tag.selectedIndex].text.toUpperCase();
+      let table = document.getElementById(tableid);
+      tr = table.getElementsByTagName("tr");
+      len=tr.length;
+    
+      //check which column for comparing filter applies
+      switch(filterVal) {
+        case "1":
+            case "2":
+                case "3":
+                    case "4":
+                        col=4;
+                        break;
+        case "5":
+            case "6":
+                case "7":
+                    col=5;
+                    break;
+        default:
+            col=7;
+      }
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[col];
+            // first need to filter the dummy-empty book 
+                bookID = document.getElementById(tableid).rows[i].cells.item(0).innerHTML;
+                if(bookID =="0"){
+                    tr[i].style.display = "none";
+                    continue;
+                }
+            // if empty/all filer, show all except Blank
+                if(filterVal==""){
+                    
+                        tr[i].style.display = "";
+                        continue;
+                }
+                if (td ) { //text compare filters
+                    txtValue = td.textContent || td.innerText;
+                    txtValue=txtValue.toUpperCase();
+                    
+                    if(col<7){
+                        if (txtValue.localeCompare(filterText)==0 ) {
+                                tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    } else {
+                        
+                        if(txtValue.includes(filterText) ){
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+    
+                
+                }
+            }
+        }
+    
+    // ************************************************************
+    //          Img Upload utilities
+    // ************************************************************
+    
+    function preview(id) {
+        document.getElementById('imgpathformA' + id).value =document.getElementById('imgfileform' + id).value;
+        document.getElementById('frame' + id).src = URL.createObjectURL(event.target.files[0]);
+        localStorage.setItem("isNewBookImage", true);
+        
+    }
+    
+    function clearImageUploadInput(id, oldImg) {
+        document.getElementById('imgfileform' + id).value = null;
+        document.getElementById('imgpathformA' + id).value =oldImg;
+        document.getElementById('frame' + id).src = oldImg;
+        localStorage.setItem("isNewBookImage", false);
+    
     }

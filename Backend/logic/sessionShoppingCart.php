@@ -2,7 +2,7 @@
 session_start();
 
 // Verbindung zur Datenbank herstellen (Beispiel)
-require (dirname(__FILE__,2) . "\config\dbaccess.php");
+require_once (dirname(__FILE__,2) . "\config\dbaccess.php");
 
 // Warenkorb aus der Session abrufen
 $cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : array();
