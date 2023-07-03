@@ -19,6 +19,29 @@
           // Standardmäßig erste Kategorie laden
           var defaultCategory = $('#category-select').val();
           loadProducts(defaultCategory);
+
+        // Bind the dragstart event to the cart icon image
+        $('#navShoppingCart img').on('dragstart', function(event) {
+            var productId = $(this).data('productId'); // Retrieve the product ID associated with the cart icon if needed
+            console.log(productId);
+            event.originalEvent.dataTransfer.setData('text/plain', productId);
+        });
+
+        // Bind the dragover event to the cart icon element
+        $('#navShoppingCart').on('dragover', function(event) {
+            event.preventDefault();
+        });
+
+        // Bind the drop event to the cart icon element
+        $('#navShoppingCart').on('drop', function(event) {
+            event.preventDefault();
+            var productId = event.originalEvent.dataTransfer.getData('text/plain');
+
+            // Retrieve the product ID based on the image URL
+            var image_url = productId;
+
+            dragAndDrop(productId);
+        });
       });
     </script>
 

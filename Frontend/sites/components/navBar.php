@@ -69,8 +69,8 @@
                     <div id="search-results"></div>
                 </form>
                 <li class="nav-item" id="navShoppingCart">
-                    <a class="nav-link" href="../sites/shoppingCart.php"><img src="../res/img/cart.png" weight="30"
-                            height="30"></a>
+                    <a class="nav-link" href="../sites/shoppingCart.php"><img src="../res/img/cart.png" weight="30" height="30" draggable="true"></a>
+                    <div id="cart-drop-target"></div>
                 </li>
                 <li class="nav-item" id="navShoppingCart">
                     <span class="badge bg-danger" id="cart-count">0</span>

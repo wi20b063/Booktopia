@@ -921,6 +921,9 @@ function addToCart(productId) {
         // Fehlerbehandlung
       }
     });
+  },
+  error: function(xhr, status, error) {
+    // Fehlerbehandlung
   }
     });
   
@@ -950,3 +953,21 @@ function addToCart(productId) {
     }
   });
 }
+
+function dragAndDrop(image_url) {
+    $.ajax({
+        url: '../../Backend/logic/services/getIdFromImage.php',
+        type: 'POST',
+        data: { image_url: image_url },
+        success: function(response) {
+            productId = response;
+            addToCart(productId);
+    
+            // Create a new element to display the dropped product
+            var productElement = $('<div class="dropped-product"></div>');
+    
+            // Append the product element to the cart drop target
+            $('#cart-drop-target').append(productElement);
+        }
+    });
+    }
